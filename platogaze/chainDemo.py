@@ -1,6 +1,6 @@
 import json
 
-class ChainBuilder:
+class Chain:
     def __init__(self):
         self.chain = {
             "type": "",
@@ -30,10 +30,10 @@ class ChainBuilder:
             json.dump(self.chain, json_file, indent=2)
 
 # Example usage:
-builder = ChainBuilder()
-builder.setType("standard")
-builder.setDisplay(False)
-builder.addPrompt("Write an essay about [0]. Use a [1] tone.")
-builder.addReference("standard", "liberty")
-builder.addReference("fixed", "serious")
-builder.saveToJson("chain.json")
+chain = Chain()
+chain.setType("standard")
+chain.setDisplay(False)
+chain.addPrompt("Write an essay about [0]. Use a [1] tone.")
+chain.addReference("standard", "liberty")
+chain.addReference("fixed", "serious")
+chain.saveToJson("chain.json")
