@@ -1,23 +1,17 @@
 {
-  "chainId": "unique_chain_identifier",
-  "tasks": [
+  "type": "standard",
+  "display": false,
+  "prompt": [
+    "Write an essay about [0]. Use a [1] tone."
+  ],
+  "reference": [
     {
-      "type": "subtask_type_1",
-      "prompt": "instruction_for_subtask_1",
-      "reference": "optional_reference_for_subtask_1",
-      "parameters": {
-        "param_1": "value_1",
-        "param_2": "value_2"
-      }
+      "type": "standard",
+      "prompt": "liberty"
     },
     {
-      "type": "subtask_type_2",
-      "prompt": "instruction_for_subtask_2",
-      "reference": "optional_reference_for_subtask_2",
-      "parameters": {
-        "param_1": "value_1",
-        "param_2": "value_2"
-      }
+      "type": "fixed",
+      "prompt": "serious"
     }
   ]
 }
