@@ -1,0 +1,39 @@
+{
+    "templateName" : "test",
+    "apiKey":"12345678",
+    "functionList":[
+        {
+            "type":"standard",  
+            "input":"需求：[0],[1]",
+            "referenceList":[
+                {
+                    "input":"结合名言说说你的看法",
+                    "type":"custom"
+                },
+                {
+                    "input":"牛顿：站在巨人的肩膀上",
+                    "type":"fixed"
+                }
+            ],
+            "over":false
+        },
+        {
+            "type":"standard",  
+            "input":"结合[1]，在[0]里，提取相关文字并分析",
+            "referenceList":[
+                {
+                    "input":"https://news.ycombinator.com/news",
+                    "type":"url"
+                },
+                {
+                    "input":0,    
+                    "type":"functionOutput"
+                }
+            ],
+            "over":true
+        }
+    ]
+}
+
+
+  
