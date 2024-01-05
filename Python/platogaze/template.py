@@ -6,7 +6,7 @@ class Template:
     def __init__(self, template_json=None):
         self.template = {
             "name": "",
-            "api": "",
+            "api_key": "",
             "chain_list": []
         }
 
@@ -15,7 +15,7 @@ class Template:
 
     def from_json(self, template_json):
         self.template["name"] = template_json.get("name", "undefined")
-        self.template["api"] = template_json.get("api", "00000000")
+        self.template["api_key"] = template_json.get("api_key", "00000000")
         self.template["chain_list"] = [
             chain for chain in template_json.get("chain_list", [])]
     
