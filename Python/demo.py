@@ -12,6 +12,7 @@ Case 1: Build a template in your python file.
 """
 
 # Build a new template and upload it.
+# 可以把这个变量的类型(type)称为Template
 test_template = platogaze.build(name="test")
 
 # Define function1 (i.e. The first tool box)
@@ -50,6 +51,10 @@ test_template.run(
 )  # save 表示把template抽象出来，保存到指定地址。如果不填save_path，那么就不把template保存下来。
 # 注：有些参数是可选的，需要我们自己设计
 
+# Upload the locally-defined template to www.platogaze.com
+test_template.upload(
+    template_name="test",
+)
 
 """
 Case 2: Run a remote template 
@@ -58,3 +63,9 @@ Case 2: Run a remote template
 # results = {output:'...', function_outputs:['..',...]}
 # output里面是 被放到编辑区的输出，function_outputs保存所有工具块的输出
 results = platogaze.run("remote_template_id")
+
+"""
+Case 3: Download a remote template
+"""
+# 下面的命令会把远端的模版下载到本地的指定目录下，并把template保存到 downloaded_template 这个实例里
+downloaded_template = platogaze.download(save_path="./template", template_id="21341234")
