@@ -1,14 +1,14 @@
 {
   "name": "test",
   "api": "12345678",
-  "chainList": [
+  "chain_list": [
     {
       "type": "standard",
       "display": false,
       "prompt": [
         "Write a [0] word essay about [1]"
       ],
-      "referenceList": [
+      "reference_list": [
         {
           "prompt": "500",
           "type": "custom"
@@ -21,18 +21,18 @@
     },
     {
       "type": "standard",
-      "display": false,
+      "display": true,
       "prompt": [
-        "Write a [0] word essay about [1]"
+        "Based on [1] find relative words in [0] and analyze them"
       ],
-      "referenceList": [
+      "reference_list": [
         {
-          "prompt": "500",
-          "type": "custom"
+          "prompt": 0,
+          "type": "chainOutput"
         },
         {
-          "prompt": "Battlefield 5",
-          "type": "fixed"
+          "prompt": "https://news.ycombinator.com/news",
+          "type": "url"
         }
       ]
     }

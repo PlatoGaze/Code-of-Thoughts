@@ -1,0 +1,15 @@
+{
+  "type": "standard",
+  "display": false,
+  "prompt": "Write a [0] hundred word essay about [1]",
+  "reference_list": [
+    {
+      "prompt": "500",
+      "type": "custom"
+    },
+    {
+      "prompt": "Battlefield 5",
+      "type": "fixed"
+    }
+  ]
+}

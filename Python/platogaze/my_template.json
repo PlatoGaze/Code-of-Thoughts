@@ -1,0 +1,40 @@
+{
+    "name": "test",
+    "api": "12345678",
+    "chain_list": [
+      {
+        "type": "standard",
+        "display": false,
+        "prompt": [
+          "Write a [0] word essay about [1]"
+        ],
+        "reference_list": [
+          {
+            "prompt": "500",
+            "type": "custom"
+          },
+          {
+            "prompt": "Battlefield 5",
+            "type": "fixed"
+          }
+        ]
+      },
+      {
+        "type": "standard",
+        "display": true,
+        "prompt": [
+          "Based on [1] find relative words in [0] and analyze them"
+        ],
+        "reference_list": [
+          {
+            "prompt": 0,
+            "type": "chainOutput"
+          },
+          {
+            "prompt": "https://news.ycombinator.com/news",
+            "type": "url"
+          }
+        ]
+      }
+    ]
+  }
