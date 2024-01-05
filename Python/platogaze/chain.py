@@ -1,7 +1,7 @@
 import json
 
 class Chain:
-    def __init__(self, chain_dict=None):
+    def __init__(self, chain_json=None):
         self.chain = {
             "type": "",
             "display": False,
@@ -9,14 +9,14 @@ class Chain:
             "reference_list": []
         }
 
-        if chain_dict:
-            self.from_dict(chain_dict)
+        if chain_json:
+            self.from_dict(chain_json)
     
-    def from_dict(self, chain_dict):
-        self.chain["type"] = chain_dict.get("type", "")
-        self.chain["display"] = chain_dict.get("display", False)
-        self.chain["prompt"] = chain_dict.get("prompt", [])
-        self.chain["reference_list"] = chain_dict.get("reference_list", [])
+    def from_dict(self, chain_json):
+        self.chain["type"] = chain_json.get("type", "")
+        self.chain["display"] = chain_json.get("display", False)
+        self.chain["prompt"] = chain_json.get("prompt", [])
+        self.chain["reference_list"] = chain_json.get("reference_list", [])
     
     def set_type(self, chain_type):
         self.chain["type"] = chain_type
@@ -37,3 +37,6 @@ class Chain:
     def save_to_json(self, file_path):
         with open(file_path, "w") as json_file:
             json.dump(self.chain, json_file, indent=2)
+    
+    def to_dict(self):
+        return self.chain.copy()
