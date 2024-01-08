@@ -5,8 +5,8 @@ from chain import Chain
 class Template:
     def __init__(self, template_json=None):
         self.template = {
-            "name": "",
-            "api_key": "",
+            "name": "undefined",
+            "api_key": "undefined",
             "chain_list": []
         }
 
