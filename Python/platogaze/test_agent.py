@@ -9,4 +9,4 @@ with open(file_path, "r") as f:
     
 template = Template(data)
 agent = Agent(template)
-agent.execute()
+agent.run()

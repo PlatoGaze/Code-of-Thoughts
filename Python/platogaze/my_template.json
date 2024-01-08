@@ -4,7 +4,7 @@
   "chain_list": [
     {
       "type": "standard",
-      "display": false,
+      "display": true,
       "prompt": [
         "Write a [0] word essay about [1]"
       ],
