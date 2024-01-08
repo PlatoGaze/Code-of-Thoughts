@@ -1,6 +1,6 @@
 from template import Template
 from chain import Chain
-import json
+
 
 
 # file_path = "Python/platogaze/my_template.json"
