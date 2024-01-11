@@ -1,9 +1,23 @@
 {
+    "name": "undefined",
+    "input_list": [],
+    "web_list": [],
+    "main_list": [],
+    "fixed_list": [],
     "expressions": [
         {
             "id": 1,
             "type": "code",
             "code": {
+                "name": "undefined",
+                "input_list": [
+                    "human traveling in digital world"
+                ],
+                "web_list": [
+                    "www.google.com"
+                ],
+                "main_list": [],
+                "fixed_list": [],
                 "expressions": [
                     {
                         "id": 1,
@@ -30,15 +44,7 @@
                             }
                         ]
                     }
-                ],
-                "input_list": [
-                    "human traveling in digital world"
-                ],
-                "web_list": [
-                    "www.google.com"
-                ],
-                "main_list": [],
-                "fixed_list": []
+                ]
             }
         },
         {
@@ -50,8 +56,13 @@
             "output_type": "string"
         },
         {
+            "name": "undefined",
             "id": 3,
             "type": "code",
+            "input_list": [],
+            "web_list": [],
+            "main_list": [],
+            "fixed_list": [],
             "expressions": [
                 {
                     "id": 1,
@@ -61,31 +72,7 @@
                     "output_type": "string",
                     "reference_list": []
                 }
-            ],
-            "input_list": [
-                
-            ],
-            "web_list": [
-                
-            ],
-            "main_list": [
-
-            ],
-            "fixed_list": [
-
             ]
         }
-    ],
-    "input_list": [
-        
-    ],
-    "web_list": [
-        
-    ],
-    "main_list": [
-
-    ],
-    "fixed_list": [
-
     ]
 }
