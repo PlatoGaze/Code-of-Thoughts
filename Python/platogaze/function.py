@@ -1,6 +1,6 @@
 import json
 
-class Chain:
+class Function:
     def __init__(self, chain_json=None):
         self.chain = {
             "type": "",
@@ -12,11 +12,11 @@ class Chain:
         if chain_json:
             self.from_dict(chain_json)
     
-    def from_dict(self, chain_json):
-        self.chain["type"] = chain_json.get("type", "")
-        self.chain["display"] = chain_json.get("display", False)
-        self.chain["prompt"] = chain_json.get("prompt", [])
-        self.chain["reference_list"] = chain_json.get("reference_list", [])
+    def from_dict(self, func_json):
+        self.chain["type"] = func_json.get("type", "")
+        self.chain["display"] = func_json.get("display", False)
+        self.chain["prompt"] = func_json.get("prompt", [])
+        self.chain["reference_list"] = func_json.get("reference_list", [])
     
     def set_type(self, chain_type):
         self.chain["type"] = chain_type

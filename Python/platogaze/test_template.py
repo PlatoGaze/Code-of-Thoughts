@@ -1,5 +1,5 @@
 from template import Template
-from chain import Chain
+from function import Function
 
 
 
@@ -7,7 +7,7 @@ from chain import Chain
 # with open(file_path, "r") as f:
 #     data = json.load(f)
 
-chain1 = Chain(
+chain1 = Function(
     {
         "type": "standard",
         "display": False,
@@ -26,7 +26,7 @@ chain1 = Chain(
         ]
     })
 
-chain2 = Chain({
+chain2 = Function({
     "type": "standard",
     "display": True,
     "prompt": [
@@ -45,6 +45,6 @@ chain2 = Chain({
 })
 
 test_template = Template()
-test_template.add_chain(chain1)
-test_template.add_chain(chain2)
+test_template.add_function(chain1)
+test_template.add_function(chain2)
 test_template.save_to_json("saved_template.json")

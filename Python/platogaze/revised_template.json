@@ -1,0 +1,83 @@
+{
+    "annotation": "Help me write a new novel",
+    "function_tree": [
+        {
+            "node_id": 1,
+            "node_type": "header",
+            "header_level": 1,
+            "header_name": "Ideation and Conceptualization",
+            "prompt": "Generate ideas for my novel. I am interested in {0}. Let's design the plotline.",
+            "display": false,
+            "reference_list": [
+                {
+                    "reference_type": "input",
+                    "referende_id": 0
+                }
+            ],
+            "sub_tree": [
+                {
+                    "node_id": 2,
+                    "node_type": "standard",
+                    "display": true,
+                    "prompt": "When did the story happen? Is it in the future, or present time? Give me your answer and reasons.",
+                    "reference_list": []
+                },
+                {
+                    "node_id": 3,
+                    "node_type": "standard",
+                    "display": true,
+                    "prompt": "Identify conflicts and obstacles within the story. Here are my thinkings: {0}. You can refer to my web for more detail, here is the link: {1}",
+                    "reference_list": [
+                        {
+                            "reference_type": "input",
+                            "reference_id": 1
+                        },
+                        {
+                            "reference_type": "web",
+                            "reference_id": 0
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "node_id": 4,
+            "node_type": "header",
+            "header_level": 1,
+            "header_name": "Character Arcs",
+            "prompt": "Plan character arcs for the protagonist and supporting characters.",
+            "reference_list": [],
+            "display": true,
+            "sub_tree": [
+                {
+                    "node_id": 5,
+                    "node_type": "standard",
+                    "display": true,
+                    "prompt": "Name two characters for the novel, a male and female.",
+                    "reference_list": []
+                },
+                {
+                    "node_id": 6,
+                    "node_type": "standard",
+                    "display": true,
+                    "prompt": "Consider how experiences of {0} will shape and change them.",
+                    "reference_list": [
+                        {
+                            "reference_type": "output",
+                            "reference_id": "unknown"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "input_list": [
+        "human traveling in digital world",
+        "The digital world is not immune to security threats. Characters could face challenges from malicious entities, viruses, or hacking attempts that threaten their existence or alter the landscape of the digital world."
+    ],
+    "web_list": [
+        "www.example.com"
+    ],
+    "paragraph_list": [],
+    "fix_list": []
+}

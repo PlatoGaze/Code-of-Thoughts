@@ -1,5 +1,5 @@
 import json
-from chain import Chain
+from function import Function
 
 
 class Template:
@@ -19,8 +19,8 @@ class Template:
         self.template["chain_list"] = [
             chain for chain in template_json.get("chain_list", [])]
     
-    def add_chain(self, new_chain):
-        self.template["chain_list"].append(new_chain.to_dict())
+    def add_function(self, new_func):
+        self.template["chain_list"].append(new_func.to_dict())
 
     def save_to_json(self, file_path):
         with open(file_path, "w") as json_file:

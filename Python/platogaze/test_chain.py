@@ -1,4 +1,4 @@
-from chain import Chain
+from Python.platogaze.function import Function
 
 chain1 = {
     "type": "standard",
@@ -15,5 +15,5 @@ chain1 = {
     ],
 }
 
-testChain1 = Chain(chain1)
+testChain1 = Function(chain1)
 testChain1.save_to_json("constructed_chain.json")
