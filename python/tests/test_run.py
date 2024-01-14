@@ -1,10 +1,10 @@
 import json
 import sys
 import os
-sys.path.append(os.getcwd() + r"/src")
+sys.path.append(os.getcwd() + r"/python/src")
 import platogaze
 
-file_path = "tests/code.json"
+file_path = "python/tests/code.json"
 
 # Load JSON data from file
 with open(file_path, 'r') as file:
