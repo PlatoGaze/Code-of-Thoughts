@@ -2,7 +2,7 @@
 This is a demo of how to use package platogaze
 """
 
-import platogaze
+import python.src.platogaze as platogaze
 
 # setting up
 platogaze.settings(api_key="12345678")  # apiKey in template file(JSON file).
