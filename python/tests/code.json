@@ -1,19 +1,118 @@
 {
-    "id": 1,
-    "name": "undefined",
-    "type": "code",
-    "input_list": [],
-    "web_list": [],
-    "main_list": [],
-    "fixed_list": [],
-    "expressions": [
+    "template": [
         {
             "id": 1,
-            "type": "expression",
-            "main": true,
-            "prompt": "Something",
-            "output_type": "string",
-            "reference_list": []
+            "name": "undefined",
+            "type": "code",
+            "expressions": [
+                {
+                    "id": 1,
+                    "type": "expression",
+                    "main": true,
+                    "prompt": "Reference 1: [0], Reference 2: [1]",
+                    "output_type": "string",
+                    "input_list": [
+                        "alpha"
+                    ],
+                    "web_list": [
+                        "www.nc.com"
+                    ],
+                    "main_list": [],
+                    "fixed_list": [],
+                    "reference_list": [
+                        {
+                            "type": "input",
+                            "id": 0
+                        },
+                        {
+                            "type": "web",
+                            "id": 0
+                        }
+                    ]
+                },
+                {
+                    "id": 2,
+                    "type": "expression",
+                    "main": true,
+                    "prompt": "Reference 1: [0], Reference 2: [1]",
+                    "output_type": "string",
+                    "input_list": [
+                        "bravo"
+                    ],
+                    "web_list": [
+                        "www.tr.com"
+                    ],
+                    "main_list": [],
+                    "fixed_list": [],
+                    "reference_list": [
+                        {
+                            "type": "input",
+                            "id": 0
+                        },
+                        {
+                            "type": "web",
+                            "id": 0
+                        }
+                    ]
+                },
+                {
+                    "id": 3,
+                    "name": "undefined",
+                    "type": "code",
+                    "expressions": [
+                        {
+                            "id": 1,
+                            "type": "expression",
+                            "main": true,
+                            "prompt": "Reference 1: [0], Reference 2: [1]",
+                            "output_type": "string",
+                            "input_list": [
+                                "charlie"
+                            ],
+                            "web_list": [
+                                "www.vs.com"
+                            ],
+                            "main_list": [],
+                            "fixed_list": [],
+                            "reference_list": [
+                                {
+                                    "type": "input",
+                                    "id": 0
+                                },
+                                {
+                                    "type": "web",
+                                    "id": 0
+                                }
+                            ]
+                        },
+                        {
+                            "id": 2,
+                            "type": "expression",
+                            "main": true,
+                            "prompt": "Reference 1: [0], Reference 2: [1]",
+                            "output_type": "string",
+                            "input_list": [
+                                "delta"
+                            ],
+                            "web_list": [
+                                "www.ns.com"
+                            ],
+                            "main_list": [],
+                            "fixed_list": [],
+                            "reference_list": [
+                                {
+                                    "type": "input",
+                                    "id": 0
+                                },
+                                {
+                                    "type": "web",
+                                    "id": 0
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
         },
         {
             "id": 2,
@@ -21,32 +120,127 @@
             "main": true,
             "prompt": "something",
             "output_type": "string",
+            "input_list": [
+                "apple"
+            ],
+            "web_list": [
+                "www.google.com"
+            ],
+            "main_list": [],
+            "fixed_list": [],
             "reference_list": []
         },
         {
             "id": 3,
             "name": "undefined",
             "type": "code",
-            "input_list": [],
-            "web_list": [],
-            "main_list": [],
-            "fixed_list": [],
             "expressions": [
                 {
                     "id": 1,
                     "type": "expression",
                     "main": true,
-                    "prompt": "Something",
+                    "prompt": "Reference 1: [0], Reference 2: [1]",
                     "output_type": "string",
-                    "reference_list": []
+                    "input_list": [
+                        "alpha team"
+                    ],
+                    "web_list": [
+                        "www.nc.com"
+                    ],
+                    "main_list": [],
+                    "fixed_list": [],
+                    "reference_list": [
+                        {
+                            "type": "input",
+                            "id": 0
+                        },
+                        {
+                            "type": "web",
+                            "id": 0
+                        }
+                    ]
                 },
                 {
                     "id": 2,
                     "type": "expression",
                     "main": true,
-                    "prompt": "something",
+                    "prompt": "Reference 1: [0], Reference 2: [1]",
                     "output_type": "string",
-                    "reference_list": []
+                    "input_list": [
+                        "bravo"
+                    ],
+                    "web_list": [
+                        "www.tr.com"
+                    ],
+                    "main_list": [],
+                    "fixed_list": [],
+                    "reference_list": [
+                        {
+                            "type": "input",
+                            "id": 0
+                        },
+                        {
+                            "type": "web",
+                            "id": 0
+                        }
+                    ]
+                },
+                {
+                    "id": 3,
+                    "name": "undefined",
+                    "type": "code",
+                    "expressions": [
+                        {
+                            "id": 1,
+                            "type": "expression",
+                            "main": true,
+                            "prompt": "Reference 1: [0], Reference 2: [1]",
+                            "output_type": "string",
+                            "input_list": [
+                                "charlie"
+                            ],
+                            "web_list": [
+                                "www.vs.com"
+                            ],
+                            "main_list": [],
+                            "fixed_list": [],
+                            "reference_list": [
+                                {
+                                    "type": "input",
+                                    "id": 0
+                                },
+                                {
+                                    "type": "web",
+                                    "id": 0
+                                }
+                            ]
+                        },
+                        {
+                            "id": 2,
+                            "type": "expression",
+                            "main": true,
+                            "prompt": "Reference 1: [0], Reference 2: [1]",
+                            "output_type": "string",
+                            "input_list": [
+                                "delta"
+                            ],
+                            "web_list": [
+                                "www.ns.com"
+                            ],
+                            "main_list": [],
+                            "fixed_list": [],
+                            "reference_list": [
+                                {
+                                    "type": "input",
+                                    "id": 0
+                                },
+                                {
+                                    "type": "web",
+                                    "id": 0
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         }
