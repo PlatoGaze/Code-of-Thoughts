@@ -32,7 +32,7 @@ class Template:
     def display(self):
         print(json.dumps(self.to_dict(), indent=4))
 
-    def get_template_by_id(self, id: str) -> 'Template':
+    def get(self, id: str = "") -> 'Template':
         """
         Retrieves a template by its ID.
 
@@ -44,22 +44,11 @@ class Template:
         """
         references = id.split('.')
         template = self.template.copy()
-        path_so_far = []
-
-        try:
-            for ix, ref in enumerate(references):
-                if ref.isdigit():
-                    ref_index = int(ref) - 1
-                    path_so_far.append(ref)
-                    template = template["functions"][ref_index]["code"]
-
-                    if not template or "functions" not in template:
-                        raise TypeError(
-                            f"{'.'.join(path_so_far)} is not a template")
-
-        except (KeyError, IndexError, TypeError):
-            return None
-
+        if id != "":
+            for ix in range(0, len(references) - 1):
+                refer = references[ix]
+                template = template["functions"][int(refer) - 1]["code"]
+            template = template["functions"][int(references[-1]) - 1]
         return Template(template)
 
     def add_template(self, new_template, id: str = ""):
