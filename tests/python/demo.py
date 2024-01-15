@@ -2,7 +2,7 @@
 This is a demo of how to use package platogaze
 """
 
-import python.src.platogaze as platogaze
+import python.platogaze as platogaze
 
 # setting up
 platogaze.settings(api_key="12345678")  # apiKey in template file(JSON file).
@@ -13,7 +13,13 @@ Case 1: Build a template in your python file.
 
 # Build a new template and upload it.
 # 可以把这个变量的类型(type)称为Template
-test_template = platogaze.build(name="test")
+
+# 1/14
+test_template = platogaze.create(name="test")
+test_template2 = platogaze.create(name="test2")
+test_template.add(test_template2, id = "")
+test_template.export(path = "")  # 文件夹
+new_template = platogaze.load("test_template/test_template.json")
 
 # Define function1 (i.e. The first tool box)
 function1 = {

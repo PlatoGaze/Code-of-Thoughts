@@ -1,0 +1,18 @@
+{
+    "name": "test_template_2",
+    "inputFieldValues": [],
+    "resourceURLs": [
+        "www.google.com"
+    ],
+    "mainValues": [],
+    "constantValues": [],
+    "functions": [
+        {
+            "id": 1,
+            "type": "standard",
+            "main": true,
+            "prompt": "Reference from url: [u0]",
+            "output_type": "string"
+        }
+    ]
+}

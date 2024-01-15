@@ -1,0 +1,43 @@
+{
+    "name": "test_template_1",
+    "inputFieldValues": [],
+    "resourceURLs": [],
+    "mainValues": [],
+    "constantValues": [],
+    "functions": [
+        {
+            "id": 1,
+            "type": "code",
+            "code": "test_template_2"
+        },
+        {
+            "id": 2,
+            "type": "standard",
+            "prompt": "Reference from input: [i0]",
+            "main": true,
+            "output_type": "string"
+        },
+        {
+            "id": 3,
+            "type": "code",
+            "code": {
+                "name": "second folder",
+                "inputFieldValues": [],
+                "resourceURLs": [],
+                "mainValues": [
+                    "first element in main"
+                ],
+                "constantValues": [],
+                "functions": [
+                    {
+                        "id": 1,
+                        "type": "standard",
+                        "main": true,
+                        "prompt": "Reference from main [m0]",
+                        "output_type": "string"
+                    }
+                ]
+            }
+        }
+    ]
+}
