@@ -1,17 +1,17 @@
 {
     "name": "test_template_2",
     "inputFieldValues": [],
-    "resourceURLs": [
-        "www.google.com"
+    "resourceURLs": [],
+    "mainValues": [
+        "first element in main"
     ],
-    "mainValues": [],
     "constantValues": [],
     "functions": [
         {
             "id": 1,
             "type": "standard",
             "main": true,
-            "prompt": "Reference from url: [u0]",
+            "prompt": "Reference from main [m0]",
             "output_type": "string"
         }
     ]

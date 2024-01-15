@@ -1,4 +1,6 @@
 import json
+
+
 class Template:
     def __init__(self, template_dict: dict) -> None:
         if (self.is_valid(template_dict)):
@@ -36,5 +38,17 @@ class Template:
 
         return Template(template)
 
-    def add_template(self, new_template, id: str):
-        
+    def add_template(self, new_template, id: str = ""):
+        references = id.split('.')
+        template = self.template.copy()
+        if id != "":
+            for refer in references:
+                template = template["functions"][refer - 1]["code"]
+        if isinstance(new_template, Template):
+            new_template = new_template.to_dict()
+        new_id = len(template["functions"]) + 1
+        template["functions"].append({
+            "id": new_id,
+            "type": "code",
+            "code": new_template
+        })
