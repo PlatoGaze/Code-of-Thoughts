@@ -33,7 +33,16 @@ program_2 = Program({
 print("program_2:")
 program_2.display()
 
-print('Update program_1["functions][0] as program_2')
-program_1.update("program", program_2, "1")
+print('Update program_2\'s first variable')
+program_2.update("variable", {
+    "name": "grandpa", "value": "Joe"
+}, "i1")
+print("new program_2")
+program_2.display()
+
+print('Update program["functions"][0]["program"]["variables][0] as grandpa Joe')
+program_1.update("variable", {
+    "name": "grandpa", "value": "Joe"
+}, "i1.1")
 print("new program_1")
 program_1.display()

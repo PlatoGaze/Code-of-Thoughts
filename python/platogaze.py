@@ -113,28 +113,12 @@ class Program:
         })
 
     def add_variable(self, item: dict, id: str = "i"):
-        """
-        Adds a variable to the specified parent program.
-
-        Args:
-            item (dict): The variable item to be added.
-            id (str): The ID of the parent program.
-
-        Raises:
-            TypeError: If item is not a dictionary.
-
-        Returns:
-            None
-        """
-        # Check if item is a dictionary
         if not isinstance(item, dict):
             raise TypeError(
                 f"Variable item should be a dictionary, instead it is {type(item)}.")
 
-        # Extract the type from the first character of id
         var_type = id[0]
 
-        # Determine the type based on the first character of id
         if var_type == 'i':
             item['type'] = 'inputFieldValue'
         elif var_type == 'u':
@@ -142,12 +126,9 @@ class Program:
         else:
             raise ValueError(f"Invalid variable type: {var_type}")
 
-        # Exclude the first character from id when getting the parent program
         program = self.get_program(id[1:])
-
         item['id'] = len(program["variables"]) + 1
 
-        # Append the variable item to program["variables"]
         program["variables"].append(item)
 
     def add(self, type: str, item, id: str = ""):
@@ -173,7 +154,7 @@ class Program:
                             ", should be a Program or dict")
         ix = int(references[-1]) - 1
         program["functions"][ix]["program"] = new_program
-    
+
     def update_function(self, new_function, id: str):
         references = id.split('.')
         program = self.get_parent_program(id)
@@ -189,6 +170,28 @@ class Program:
         program["functions"][ix] = {
             "id": ix + 1,
             **new_function
+        }
+
+    def update_variable(self, item: dict, id: str = "i1"):
+        if not isinstance(item, dict):
+            raise TypeError(
+                f"Variable item should be a dictionary, instead it is {type(item)}.")
+
+        var_type = id[0]
+
+        if var_type == 'i':
+            item['type'] = 'inputFieldValue'
+        elif var_type == 'u':
+            item['type'] = 'resourceURL'
+        else:
+            raise ValueError(f"Invalid variable type: {var_type}")
+
+        references = id[1:].split(".")
+        program = self.get_program(".".join(references[:-1]))
+        ix = int(references[-1]) - 1
+        program["variables"][ix] = {
+            "id": ix + 1,
+            **item
         }
 
     def update(self, type: str, item, id: str = ""):
