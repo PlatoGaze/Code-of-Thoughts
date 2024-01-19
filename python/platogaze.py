@@ -57,6 +57,15 @@ class Program:
                 refer = references[ix]
                 program = program["functions"][int(refer) - 1]["program"]
         return program
+    
+    def get_program(self, id: str = "1"):
+        references = id.split('.')
+        program = self.properties
+        if id != "":
+            for ix in range(0, len(references)):
+                refer = references[ix]
+                program = program["functions"][int(refer) - 1]["program"]
+        return program
 
     def get(self, id: str = ""):
         program = self.get_parent_program(id)
@@ -75,7 +84,7 @@ class Program:
 
     def add_program(self, new_program, id: str = ""):
         references = id.split('.')
-        program = self.get_parent_program(id)
+        program = self.get_program(id)
         if isinstance(new_program, Program):
             new_program = new_program.to_dict()
         elif isinstance(new_program, dict):
@@ -93,7 +102,7 @@ class Program:
 
     def add_function(self, new_function, id: str):
         references = id.split('.')
-        program = self.get_parent_program(id)
+        program = self.get_program(id)
         if isinstance(new_function, Function):
             new_function = new_function.to_dict()
         elif isinstance(new_function, dict):
@@ -107,14 +116,45 @@ class Program:
             "id": new_id,
             **new_function
         })
-        
-    def add_variable(self, item, id: str = ""):
-        references = id.split('.')
-        program = self.get_parent_program(id)
+
+    def add_variable(self, item: dict, id: str = "i"):
+        """
+        Adds a variable to the specified parent program.
+
+        Args:
+            item (dict): The variable item to be added.
+            id (str): The ID of the parent program.
+
+        Raises:
+            TypeError: If item is not a dictionary.
+
+        Returns:
+            None
+        """
+        # Check if item is a dictionary
         if not isinstance(item, dict):
-            raise TypeError("variable item should be a dict, instead it is " + type(item))
+            raise TypeError(
+                f"Variable item should be a dictionary, instead it is {type(item)}.")
+
+        # Extract the type from the first character of id
+        var_type = id[0]
+
+        # Determine the type based on the first character of id
+        if var_type == 'i':
+            item['type'] = 'inputFieldValue'
+        elif var_type == 'u':
+            item['type'] = 'resourceURL'
+        else:
+            raise ValueError(f"Invalid variable type: {var_type}")
         
-    
+        # Exclude the first character from id when getting the parent program
+        program = self.get_program(id[1:])
+        
+        item['id'] = len(program["variables"]) + 1
+
+        # Append the variable item to program["variables"]
+        program["variables"].append(item)
+
     def add(self, type: str, item, id: str = ""):
         if type == "program":
             self.add_program(item, id)

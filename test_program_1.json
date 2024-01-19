@@ -41,13 +41,6 @@
                         "main": true,
                         "prompt": "Reference from main [m0]",
                         "output_type": "string"
-                    },
-                    {
-                        "id": 2,
-                        "type": "standard",
-                        "main": true,
-                        "prompt": "Reference from main [m0]",
-                        "output_type": "string"
                     }
                 ]
             }
