@@ -49,15 +49,6 @@ class Program:
     def display(self):
         print(json.dumps(self.to_dict(), indent=4))
 
-    def get_parent_program(self, id: str = ""):
-        references = id.split('.')
-        program = self.properties
-        if id != "":
-            for ix in range(0, len(references) - 1):
-                refer = references[ix]
-                program = program["functions"][int(refer) - 1]["program"]
-        return program
-    
     def get_program(self, id: str = "1"):
         references = id.split('.')
         program = self.properties
@@ -67,9 +58,13 @@ class Program:
                 program = program["functions"][int(refer) - 1]["program"]
         return program
 
+    def get_parent_program(self, id: str):
+        references = id.split(".")
+        return self.get_program(".".join(references[:-1]))
+
     def get(self, id: str = ""):
-        program = self.get_parent_program(id)
         references = id.split('.')
+        program = self.get_program(".".join(references[:-1]))
         program = program["functions"][int(references[-1]) - 1]
         if "program" in program:
             return {
@@ -146,10 +141,10 @@ class Program:
             item['type'] = 'resourceURL'
         else:
             raise ValueError(f"Invalid variable type: {var_type}")
-        
+
         # Exclude the first character from id when getting the parent program
         program = self.get_program(id[1:])
-        
+
         item['id'] = len(program["variables"]) + 1
 
         # Append the variable item to program["variables"]
@@ -162,6 +157,30 @@ class Program:
             self.add_function(item, id)
         elif type == "variable":
             self.add_variable(item, id)
+        else:
+            raise TypeError("Unrecognized type: " + type)
+
+    def update_program(self, new_program, id: str = ""):
+        references = id.split('.')
+        program = self.get_parent_program(id)
+        if isinstance(new_program, Program):
+            new_program = new_program.to_dict()
+        elif isinstance(new_program, dict):
+            new_program = Program(new_program)
+            new_program = new_program.to_dict()
+        else:
+            raise TypeError("Invalid type: " + type(new_program) +
+                            ", should be a Program or dict")
+        ix = int(references[-1]) - 1
+        program["functions"][ix] = {"id":  int(references[-1]), **new_program}
+
+    def update(self, type: str, item, id: str = ""):
+        if type == "program":
+            self.update_program(item, id)
+        elif type == "function":
+            self.update_function(item, id)
+        elif type == "variable":
+            self.update_variable(item, id)
         else:
             raise TypeError("Unrecognized type: " + type)
 
