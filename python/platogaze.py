@@ -173,6 +173,23 @@ class Program:
                             ", should be a Program or dict")
         ix = int(references[-1]) - 1
         program["functions"][ix]["program"] = new_program
+    
+    def update_function(self, new_function, id: str):
+        references = id.split('.')
+        program = self.get_parent_program(id)
+        if isinstance(new_function, Function):
+            new_function = new_function.to_dict()
+        elif isinstance(new_function, dict):
+            new_function = Function(new_function)
+            new_function = new_function.to_dict()
+        else:
+            raise TypeError("Invalid type: " + type(new_function) +
+                            ", should be a Funtion or dict")
+        ix = int(references[-1]) - 1
+        program["functions"][ix] = {
+            "id": ix + 1,
+            **new_function
+        }
 
     def update(self, type: str, item, id: str = ""):
         if type == "program":
