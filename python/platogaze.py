@@ -172,7 +172,7 @@ class Program:
             raise TypeError("Invalid type: " + type(new_program) +
                             ", should be a Program or dict")
         ix = int(references[-1]) - 1
-        program["functions"][ix] = {"id":  int(references[-1]), **new_program}
+        program["functions"][ix]["program"] = new_program
 
     def update(self, type: str, item, id: str = ""):
         if type == "program":
