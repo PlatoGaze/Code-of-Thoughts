@@ -82,30 +82,30 @@ class Program:
         return self.get_program(".".join(references[:-1]))
 
     def get(self, id: str = ""):
-            """
-            Retrieves an item based on the given ID.
+        """
+        Retrieves an item based on the given ID.
 
-            Args:
-                `id` (str): The ID of the item to retrieve.
+        Args:
+            `id` (str): The ID of the item to retrieve.
 
-            Returns:
-                `dict`: A dictionary containing the type of the item and the item itself.
-                      If the item is a program, the type will be "program" and the item will be an instance of the Program class.
-                      If the item is a function, the type will be "function" and the item will be an instance of the Function class.
-            """
-            references = id.split('.')
-            program = self.get_program(".".join(references[:-1]))
-            program = program["functions"][int(references[-1]) - 1]
-            if "program" in program:
-                return {
-                    "type": "program",
-                    "item": Program(program["program"])
-                }
-            else:
-                return {
-                    "type": "function",
-                    "item": Function(program)
-                }
+        Returns:
+            `dict`: A dictionary containing the type of the item and the item itself.
+                  If the item is a program, the type will be "program" and the item will be an instance of the Program class.
+                  If the item is a function, the type will be "function" and the item will be an instance of the Function class.
+        """
+        references = id.split('.')
+        program = self.get_program(".".join(references[:-1]))
+        program = program["functions"][int(references[-1]) - 1]
+        if "program" in program:
+            return {
+                "type": "program",
+                "item": Program(program["program"])
+            }
+        else:
+            return {
+                "type": "function",
+                "item": Function(program)
+            }
 
     def add_program(self, new_program, id: str = ""):
         """
@@ -200,28 +200,28 @@ class Program:
         program["variables"].append(item)
 
     def add(self, type: str, item, id: str = ""):
-            """
-            Adds an item of the specified type to the PlatoGaze object.
+        """
+        Adds an item of the specified type to the PlatoGaze object.
 
-            Parameters:
-            - type (str): The type of item to add. Valid values are "program", "function", and "variable".
-            - item: The item to add.
-            - id (str): Optional. The ID of the item.
+        Parameters:
+        - type (str): The type of item to add. Valid values are "program", "function", and "variable".
+        - item: The item to add.
+        - id (str): Optional. The ID of the item.
 
-            Raises:
-            - TypeError: If the specified type is not recognized.
+        Raises:
+        - TypeError: If the specified type is not recognized.
 
-            Returns:
-            None
-            """
-            if type == "program":
-                self.add_program(item, id)
-            elif type == "function":
-                self.add_function(item, id)
-            elif type == "variable":
-                self.add_variable(item, id)
-            else:
-                raise TypeError("Unrecognized type: " + type)
+        Returns:
+        None
+        """
+        if type == "program":
+            self.add_program(item, id)
+        elif type == "function":
+            self.add_function(item, id)
+        elif type == "variable":
+            self.add_variable(item, id)
+        else:
+            raise TypeError("Unrecognized type: " + type)
 
     def update_program(self, new_program, id: str = ""):
         """
@@ -327,13 +327,40 @@ class Program:
             raise TypeError("Unrecognized type: " + type)
 
 
-def create(name="undefined", **kwargs) -> Program:
-    program_dict = {
+def create_program(name: str = "undefined"):
+    return Program({
         "name": name,
-        "variables": kwargs.get("variables", [])
+        "variables": [],
+        "functions": []
+    })
+
+
+def create_function(function_dict: dict):
+    return Function({
+        "type": function_dict.get("type", "standard"),
+        "main": function_dict.get("main", True),
+        "prompt": function_dict.get("prompt", ""),
+        "output_type": function_dict.get("output_type", "string")
+    })
+
+
+def create_variable(variable_dict: dict):
+    return {
+        "type": variable_dict.get("type", "inputFieldValue"),
+        "name": variable_dict.get("name", "undefined"),
+        "value": variable_dict.get("value", "")
     }
-    program = Program(program_dict)
-    return program
+
+
+def create(type: str = "program", value: dict = {}):
+    if type == "program":
+        return create_program(value.get("name", "undefined"))
+    elif type == "function":
+        return create_function(value)
+    elif type == "variable":
+        return create_variable(value)
+    else:
+        raise TypeError("Unrecognized type: " + type)
 
 
 def load_from_json(file_path: str) -> Program:
