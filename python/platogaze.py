@@ -21,7 +21,7 @@ class Function:
 class Program:
     def __init__(self, program_dict: dict) -> None:
         """
-        Initializes an instance of MyClass with a program dictionary.
+        Initializes an instance of Program with a program dictionary.
 
         Args:
             program_dict (dict): A dictionary representing the program.
@@ -50,6 +50,15 @@ class Program:
         print(json.dumps(self.to_dict(), indent=4))
 
     def get_program(self, id: str = "1"):
+        """
+        Retrieves the program based on the given ID.
+
+        Args:
+            `id` (str): The ID of the program to retrieve. Defaults to "1".
+
+        Returns:
+            `dict`: The program corresponding to the given ID.
+        """
         references = id.split('.')
         program = self.properties
         if id != "":
@@ -59,26 +68,59 @@ class Program:
         return program
 
     def get_parent_program(self, id: str):
+        """
+        Retrieves the parent program of the given ID.
+
+        Args:
+            `id` (str): The ID of the program.
+
+        Returns:
+            The parent program object.
+
+        """
         references = id.split(".")
         return self.get_program(".".join(references[:-1]))
 
     def get(self, id: str = ""):
-        references = id.split('.')
-        program = self.get_program(".".join(references[:-1]))
-        program = program["functions"][int(references[-1]) - 1]
-        if "program" in program:
-            return {
-                "type": "program",
-                "item": Program(program["program"])
-            }
-        else:
-            return {
-                "type": "function",
-                "item": Function(program)
-            }
+            """
+            Retrieves an item based on the given ID.
+
+            Args:
+                `id` (str): The ID of the item to retrieve.
+
+            Returns:
+                `dict`: A dictionary containing the type of the item and the item itself.
+                      If the item is a program, the type will be "program" and the item will be an instance of the Program class.
+                      If the item is a function, the type will be "function" and the item will be an instance of the Function class.
+            """
+            references = id.split('.')
+            program = self.get_program(".".join(references[:-1]))
+            program = program["functions"][int(references[-1]) - 1]
+            if "program" in program:
+                return {
+                    "type": "program",
+                    "item": Program(program["program"])
+                }
+            else:
+                return {
+                    "type": "function",
+                    "item": Function(program)
+                }
 
     def add_program(self, new_program, id: str = ""):
-        references = id.split('.')
+        """
+        Adds a new program to the existing program list.
+
+        Args:
+            `new_program` (``Program`` or `dict`): The new program to be added. It can be either a `Program` object or a dictionary.
+            id (str, optional): The ID of the program whose functions will be appended. Consider the id as the folder's path. If not provided, a new program will be added to the root path.
+
+        Raises:
+            `TypeError`: If the new_program is not of type `Program` or dict.
+
+        Returns:
+            `None`
+        """
         program = self.get_program(id)
         if isinstance(new_program, Program):
             new_program = new_program.to_dict()
@@ -96,7 +138,19 @@ class Program:
         })
 
     def add_function(self, new_function, id: str):
-        references = id.split('.')
+        """
+        Adds a new function to the program identified by the given ID.
+
+        Args:
+            `new_function` (Function or dict): The new function to be added. It can be either a Function object or a dictionary representing the function.
+            id (str): The ID of the program where the function should be added.
+
+        Raises:
+            TypeError: If the new_function parameter is not of type Function or dict.
+
+        Returns:
+            None
+        """
         program = self.get_program(id)
         if isinstance(new_function, Function):
             new_function = new_function.to_dict()
@@ -105,14 +159,28 @@ class Program:
             new_function = new_function.to_dict()
         else:
             raise TypeError("Invalid type: " + type(new_function) +
-                            ", should be a Funtion or dict")
+                            ", should be a Function or dict")
         new_id = len(program["functions"]) + 1
         program["functions"].append({
             "id": new_id,
             **new_function
         })
 
-    def add_variable(self, item: dict, id: str = "i"):
+    def add_variable(self, item: dict, id: str):
+        """
+        Adds a variable to the program.
+
+        Args:
+            item (dict): The variable item to be added. Should be a dictionary.
+            id (str): The ID of the program.
+
+        Raises:
+            TypeError: If the item is not a dictionary.
+            ValueError: If the variable type is invalid.
+
+        Returns:
+            None
+        """
         if not isinstance(item, dict):
             raise TypeError(
                 f"Variable item should be a dictionary, instead it is {type(item)}.")
@@ -132,16 +200,43 @@ class Program:
         program["variables"].append(item)
 
     def add(self, type: str, item, id: str = ""):
-        if type == "program":
-            self.add_program(item, id)
-        elif type == "function":
-            self.add_function(item, id)
-        elif type == "variable":
-            self.add_variable(item, id)
-        else:
-            raise TypeError("Unrecognized type: " + type)
+            """
+            Adds an item of the specified type to the PlatoGaze object.
+
+            Parameters:
+            - type (str): The type of item to add. Valid values are "program", "function", and "variable".
+            - item: The item to add.
+            - id (str): Optional. The ID of the item.
+
+            Raises:
+            - TypeError: If the specified type is not recognized.
+
+            Returns:
+            None
+            """
+            if type == "program":
+                self.add_program(item, id)
+            elif type == "function":
+                self.add_function(item, id)
+            elif type == "variable":
+                self.add_variable(item, id)
+            else:
+                raise TypeError("Unrecognized type: " + type)
 
     def update_program(self, new_program, id: str = ""):
+        """
+        Updates the program at the specified ID with the new program.
+
+        Args:
+            new_program (Program or dict): The new program to update with.
+            id (str): The ID of the program to update. Defaults to an empty string.
+
+        Raises:
+            TypeError: If the new_program is not of type Program or dict.
+
+        Returns:
+            None
+        """
         references = id.split('.')
         program = self.get_parent_program(id)
         if isinstance(new_program, Program):
@@ -156,6 +251,19 @@ class Program:
         program["functions"][ix]["program"] = new_program
 
     def update_function(self, new_function, id: str):
+        """
+        Update a function in the program with the given ID.
+
+        Args:
+            new_function (Union[Function, dict]): The new function to update. It can be either a Function object or a dictionary.
+            id (str): The ID of the function to update.
+
+        Raises:
+            TypeError: If the new_function is not of type Function or dict.
+
+        Returns:
+            None
+        """
         references = id.split('.')
         program = self.get_parent_program(id)
         if isinstance(new_function, Function):
@@ -165,7 +273,7 @@ class Program:
             new_function = new_function.to_dict()
         else:
             raise TypeError("Invalid type: " + type(new_function) +
-                            ", should be a Funtion or dict")
+                            ", should be a Function or dict")
         ix = int(references[-1]) - 1
         program["functions"][ix] = {
             "id": ix + 1,
@@ -187,7 +295,7 @@ class Program:
             raise ValueError(f"Invalid variable type: {var_type}")
 
         references = id[1:].split(".")
-        program = self.get_program(".".join(references[:-1]))
+        program = self.get_parent_program(".".join(references))
         ix = int(references[-1]) - 1
         program["variables"][ix] = {
             "id": ix + 1,
@@ -195,6 +303,20 @@ class Program:
         }
 
     def update(self, type: str, item, id: str = ""):
+        """
+        Update the specified item based on the given type.
+
+        Parameters:
+        - type (str): The type of item to update. Valid values are "program", "function", or "variable".
+        - item: The item to update.
+        - id (str): The ID of the item (optional).
+
+        Raises:
+        - TypeError: If the type is unrecognized.
+
+        Returns:
+        - None
+        """
         if type == "program":
             self.update_program(item, id)
         elif type == "function":
