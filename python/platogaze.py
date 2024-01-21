@@ -31,10 +31,24 @@ class Program:
         Raises:
             ValueError: If the program format is invalid.
         """
+        program_dict = copy.deepcopy(program_dict)
         if self.is_valid(program_dict):
             self.properties = program_dict
         else:
             raise ValueError("Invalid program format")
+        
+        self.add_type_methods = {
+            "program": self.add_program,
+            "function": self.add_function,
+            "variable": self.add_variable
+        }
+        
+        self.update_type_methods = {
+            "program": self.update_program,
+            "function": self.update_function,
+            "variable": self.update_variable
+        }
+        
 
     def is_valid(self, program_dict: dict):
         return True
@@ -282,12 +296,9 @@ class Program:
         None
         """
         item = copy.deepcopy(item)
-        if type == "program":
-            self.add_program(item, id)
-        elif type == "function":
-            self.add_function(item, id)
-        elif type == "variable":
-            self.add_variable(item, id)
+        add_func = self.add_type_methods.get(type)
+        if add_func:
+            add_func(item, id)
         else:
             raise TypeError("Unrecognized type: " + type)
 
@@ -377,12 +388,9 @@ class Program:
         - None
         """
         item = copy.deepcopy(item)
-        if type == "program":
-            self.update_program(item, id)
-        elif type == "function":
-            self.update_function(item, id)
-        elif type == "variable":
-            self.update_variable(item, id)
+        update_func = self.update_type_methods.get(type)
+        if update_func:
+            update_func(item, id)
         else:
             raise TypeError("Unrecognized type: " + type)
 

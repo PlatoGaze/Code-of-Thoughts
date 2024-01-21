@@ -1,0 +1,20 @@
+{
+    "name": "DNA program",
+    "variables": [
+        {
+            "id": 1,
+            "type": "inputFieldValue",
+            "name": "uncle",
+            "value": "Sam"
+        }
+    ],
+    "functions": [
+        {
+            "id": 1,
+            "type": "standard",
+            "main": true,
+            "prompt": "Bro, that is DNA!",
+            "output_type": "string"
+        }
+    ]
+}
