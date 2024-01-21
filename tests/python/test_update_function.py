@@ -85,10 +85,10 @@ function_1.display()
 #     "output_type": "string"
 # }
 
-# print('Update program["functions"][1] as function_1')
-# program_1.update("function", function_1, "2")
-# print("new program_1")
-# program_1.display()
+print('Update program["functions"][1] as function_1')
+program_1.update("function", function_1, "2")
+print("new program_1")
+program_1.display()
 
 # new program_1
 # {

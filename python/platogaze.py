@@ -83,6 +83,12 @@ class Program:
         """
         references = id.split(".")
         return self.get_program(".".join(references[:-1]))
+    
+    def get_variable(self, id: str) -> dict:
+        references = id.split('.')
+        program = self.get_program(".".join(references[:-1]))
+        variable = program["variables"][int(references[-1]) - 1]
+        return variable
 
     def get(self, id: str = "") -> dict:
             """
@@ -96,7 +102,9 @@ class Program:
             """
             if id == "":  # return the root program
                 return self.properties
-            
+            # if the first char of id is an alphabet, then we should call get_variable
+            if id[0].isalpha():
+                return self.get_variable(id[1:])
             references = id.split('.')
             program = self.get_program(".".join(references[:-1]))
             program = program["functions"][int(references[-1]) - 1]
