@@ -1,6 +1,6 @@
 import sys
 import os
-
+import json
 sys.path.append(os.getcwd() + r"\python")
 import platogaze
 
@@ -8,8 +8,10 @@ program_1_path = "test_program_1.json"
 
 test_program_1 = platogaze.load_from_json(file_path="test_program_1.json")
 
-test_program_1.get("1")["item"].display()
-test_program_1.get("2")["item"].display()
+print(json.dumps(test_program_1.get("1"), indent=4))
+print(json.dumps(test_program_1.get("2"), indent=4))
+print(json.dumps(test_program_1.get("1.1"), indent=4))
+print(json.dumps(test_program_1.get("1.2"), indent=4))
 
 # {
 #     "name": "test_program_2",

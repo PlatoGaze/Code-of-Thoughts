@@ -60,11 +60,13 @@ class Program:
             `dict`: The program corresponding to the given ID.
         """
         references = id.split('.')
+        if id == "":
+            return self.properties
+        
         program = self.properties
-        if id != "":
-            for ix in range(0, len(references)):
-                refer = references[ix]
-                program = program["functions"][int(refer) - 1]["program"]
+        for ix in range(0, len(references)):
+            refer = references[ix]
+            program = program["functions"][int(refer) - 1]["program"]
         return program
 
     def get_parent_program(self, id: str):
@@ -76,36 +78,33 @@ class Program:
 
         Returns:
             The parent program object.
-
+            
+            update function 1.2
         """
         references = id.split(".")
         return self.get_program(".".join(references[:-1]))
 
-    def get(self, id: str = ""):
-        """
-        Retrieves an item based on the given ID.
+    def get(self, id: str = "") -> dict:
+            """
+            Retrieves a program or function based on the given ID.
 
-        Args:
-            `id` (str): The ID of the item to retrieve.
+            Args:
+                id (str): The ID of the program or function to retrieve.
 
-        Returns:
-            `dict`: A dictionary containing the type of the item and the item itself.
-                  If the item is a program, the type will be "program" and the item will be an instance of the Program class.
-                  If the item is a function, the type will be "function" and the item will be an instance of the Function class.
-        """
-        references = id.split('.')
-        program = self.get_program(".".join(references[:-1]))
-        program = program["functions"][int(references[-1]) - 1]
-        if "program" in program:
-            return {
-                "type": "program",
-                "item": Program(program["program"])
-            }
-        else:
-            return {
-                "type": "function",
-                "item": Function(program)
-            }
+            Returns:
+                str or dict: The program or function corresponding to the given ID.
+            """
+            if id == "":  # return the root program
+                return self.properties
+            
+            references = id.split('.')
+            program = self.get_program(".".join(references[:-1]))
+            program = program["functions"][int(references[-1]) - 1]
+            if "program" in program:
+                return program["program"]
+            else:
+                return program
+
 
     def add_program(self, new_program, id: str = ""):
         """
@@ -121,7 +120,7 @@ class Program:
         Returns:
             `None`
         """
-        program = self.get_program(id)
+        program = self.get(id)
         if isinstance(new_program, Program):
             new_program = new_program.to_dict()
         elif isinstance(new_program, dict):
@@ -151,7 +150,7 @@ class Program:
         Returns:
             None
         """
-        program = self.get_program(id)
+        program = self.get(id)
         if isinstance(new_function, Function):
             new_function = new_function.to_dict()
         elif isinstance(new_function, dict):
@@ -194,7 +193,7 @@ class Program:
         else:
             raise ValueError(f"Invalid variable type: {var_type}")
 
-        program = self.get_program(id[1:])
+        program = self.get(id[1:])
         item['id'] = len(program["variables"]) + 1
 
         program["variables"].append(item)
@@ -237,8 +236,6 @@ class Program:
         Returns:
             None
         """
-        references = id.split('.')
-        program = self.get_parent_program(id)
         if isinstance(new_program, Program):
             new_program = new_program.to_dict()
         elif isinstance(new_program, dict):
@@ -247,8 +244,8 @@ class Program:
         else:
             raise TypeError("Invalid type: " + type(new_program) +
                             ", should be a Program or dict")
-        ix = int(references[-1]) - 1
-        program["functions"][ix]["program"] = new_program
+        original = self.get(id)
+        original.update(new_program)
 
     def update_function(self, new_function, id: str):
         """
@@ -264,8 +261,7 @@ class Program:
         Returns:
             None
         """
-        references = id.split('.')
-        program = self.get_parent_program(id)
+        program = self.get(id)
         if isinstance(new_function, Function):
             new_function = new_function.to_dict()
         elif isinstance(new_function, dict):
@@ -274,11 +270,7 @@ class Program:
         else:
             raise TypeError("Invalid type: " + type(new_function) +
                             ", should be a Function or dict")
-        ix = int(references[-1]) - 1
-        program["functions"][ix] = {
-            "id": ix + 1,
-            **new_function
-        }
+        program.update(new_function)
 
     def update_variable(self, item: dict, id: str = "i1"):
         if not isinstance(item, dict):
@@ -295,12 +287,9 @@ class Program:
             raise ValueError(f"Invalid variable type: {var_type}")
 
         references = id[1:].split(".")
-        program = self.get_parent_program(".".join(references))
+        program = self.get(".".join(references[:-1]))
         ix = int(references[-1]) - 1
-        program["variables"][ix] = {
-            "id": ix + 1,
-            **item
-        }
+        program["variables"][ix].update(item)
 
     def update(self, type: str, item, id: str = ""):
         """
