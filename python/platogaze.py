@@ -149,12 +149,13 @@ class Program:
         variable = program["variables"][int(references[-1]) - 1]
         return variable
 
-    def get(self, id: str = "") -> dict:
+    def read(self, id: str = "") -> dict:
         """
         Retrieves a program or function based on the given ID.
 
         Args:
             id (str): The ID of the program or function to retrieve.
+            If try to read a variable, the id should be like "v1" (any variable type + variable id)
 
         Returns:
             str or dict: The program or function corresponding to the given ID.
@@ -186,7 +187,7 @@ class Program:
         Returns:
             `None`
         """
-        program = self.get(id)
+        program = self.read(id)
         if isinstance(new_program, Program):
             new_program = new_program.to_dict()
         elif isinstance(new_program, dict):
@@ -216,7 +217,7 @@ class Program:
         Returns:
             None
         """
-        program = self.get(id)
+        program = self.read(id)
         if isinstance(new_function, Function):
             new_function = new_function.to_dict()
         elif isinstance(new_function, dict):
@@ -259,7 +260,7 @@ class Program:
         else:
             raise ValueError(f"Invalid variable type: {var_type}")
 
-        program = self.get(id[1:])
+        program = self.read(id[1:])
         item['id'] = len(program["variables"]) + 1
 
         program["variables"].append(item)
@@ -312,7 +313,7 @@ class Program:
         else:
             raise TypeError("Invalid type: " + type(new_program) +
                             ", should be a Program or dict")
-        original = self.get(id)
+        original = self.read(id)
         original.update(new_program)
 
     def update_function(self, new_function, id: str):
@@ -329,7 +330,7 @@ class Program:
         Returns:
             None
         """
-        program = self.get(id)
+        program = self.read(id)
         if isinstance(new_function, Function):
             new_function = new_function.to_dict()
         elif isinstance(new_function, dict):
@@ -355,7 +356,7 @@ class Program:
             raise ValueError(f"Invalid variable type: {var_type}")
 
         references = id[1:].split(".")
-        program = self.get(".".join(references[:-1]))
+        program = self.read(".".join(references[:-1]))
         ix = int(references[-1]) - 1
         program["variables"][ix].update(item)
 

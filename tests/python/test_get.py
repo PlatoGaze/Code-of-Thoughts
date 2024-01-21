@@ -8,10 +8,10 @@ program_1_path = "test_program_1.json"
 
 test_program_1 = platogaze.load_from_json(file_path="test_program_1.json")
 
-print(json.dumps(test_program_1.get("1"), indent=4))
-print(json.dumps(test_program_1.get("2"), indent=4))
-print(json.dumps(test_program_1.get("1.1"), indent=4))
-print(json.dumps(test_program_1.get("1.2"), indent=4))
+print(json.dumps(test_program_1.read("1"), indent=4))
+print(json.dumps(test_program_1.read("2"), indent=4))
+print(json.dumps(test_program_1.read("1.1"), indent=4))
+print(json.dumps(test_program_1.read("1.2"), indent=4))
 
 # {
 #     "name": "test_program_2",
