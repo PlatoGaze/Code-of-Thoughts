@@ -63,9 +63,9 @@ class Program:
         for function_data in self.properties.get("functions", []):
             if function_data.get("type") == "program":
                 # If it's a program type, create a link
-                link_data = {
-                    "id": function_data["id"], "link": function_data["program"]["name"]}
-                main_data["functions"].append(link_data)
+                program_data = {
+                    "id": function_data["id"], "program": function_data["program"]["name"]}
+                main_data["functions"].append(program_data)
 
                 # Save the program data in a separate file
                 program_json_path = os.path.join(

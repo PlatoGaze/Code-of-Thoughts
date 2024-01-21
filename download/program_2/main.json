@@ -18,7 +18,7 @@
         },
         {
             "id": 2,
-            "link": "program_1"
+            "program": "program_1"
         },
         {
             "id": 3,
