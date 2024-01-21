@@ -1,0 +1,51 @@
+{
+    "name": "program_1",
+    "variables": [],
+    "functions": [
+        {
+            "id": 1,
+            "type": "standard",
+            "main": true,
+            "prompt": "Oh mighty god!",
+            "output_type": "string"
+        },
+        {
+            "id": 2,
+            "type": "standard",
+            "main": true,
+            "prompt": "What's your name?",
+            "output_type": "string"
+        },
+        {
+            "id": 3,
+            "type": "standard",
+            "main": true,
+            "prompt": "Oh mighty god!",
+            "output_type": "string"
+        },
+        {
+            "id": 4,
+            "type": "program",
+            "program": {
+                "name": "program_1",
+                "variables": [],
+                "functions": [
+                    {
+                        "id": 1,
+                        "type": "standard",
+                        "main": true,
+                        "prompt": "Oh mighty god!",
+                        "output_type": "string"
+                    },
+                    {
+                        "id": 2,
+                        "type": "standard",
+                        "main": true,
+                        "prompt": "What's your name?",
+                        "output_type": "string"
+                    }
+                ]
+            }
+        }
+    ]
+}

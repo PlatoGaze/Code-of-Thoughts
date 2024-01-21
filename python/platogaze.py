@@ -2,6 +2,7 @@ import json
 import os
 import copy
 
+
 class Function:
     def __init__(self, function_dict: dict) -> None:
         if self.is_valid(function_dict):
@@ -39,13 +40,47 @@ class Program:
         return True
 
     def save_to_file(self):
+        try:
+            program_name = self.properties["name"]
+        except KeyError:
+            print("Error: 'name' key not found in properties.")
+            return
+        
         directory = "download"
-        file_name = self.properties["name"]
-        file_path = f"{directory}/{file_name}.json"
-        # Create the 'download' directory if it doesn't exist
-        os.makedirs(directory, exist_ok=True)
-        with open(file_path, "w") as file:
-            json.dump(self.properties, file, indent=4)
+        # Create a folder named after the program name inside the 'download' folder
+        program_folder = os.path.join(directory, program_name)
+        os.makedirs(program_folder, exist_ok=True)
+
+        # Create and save main.json inside the program folder
+        main_json_path = os.path.join(program_folder, "main.json")
+        main_data = {
+            "name": program_name,
+            "variables": self.properties.get("variables", []),
+            "functions": []
+        }
+
+        # Traverse self.properties["functions"]
+        for function_data in self.properties.get("functions", []):
+            if function_data.get("type") == "program":
+                # If it's a program type, create a link
+                link_data = {
+                    "id": function_data["id"], "link": function_data["program"]["name"]}
+                main_data["functions"].append(link_data)
+
+                # Save the program data in a separate file
+                program_json_path = os.path.join(
+                    program_folder, function_data["program"]["name"] + ".json")
+                with open(program_json_path, "w") as program_file:
+                    json.dump(function_data["program"], program_file, indent=4)
+            else:
+                # If it's a function type, add it to main.json's functions
+                main_data["functions"].append(function_data)
+
+        # Save main.json inside the program folder
+        with open(main_json_path, "w") as main_file:
+            json.dump(main_data, main_file, indent=4)
+
+        print(f"Files saved successfully for program: {program_name}")
 
     def download_on_change(method):
         """This method is a decorator for all methods that change the program object. It will automatically save the program to a file after the method is executed.
@@ -53,6 +88,7 @@ class Program:
         Args:
             method (function): The method to be decorated.
         """
+
         def wrapper(self, *args, **kwargs):
             result = method(self, *args, **kwargs)
             self.save_to_file()
@@ -68,8 +104,7 @@ class Program:
             dict: A dictionary representation of the program object.
         """
         return self.properties.copy()
-    
-    
+
     def display(self):
         print(json.dumps(self.to_dict(), indent=4))
 
@@ -86,7 +121,7 @@ class Program:
         references = id.split('.')
         if id == "":
             return self.properties
-        
+
         program = self.properties
         for ix in range(0, len(references)):
             refer = references[ix]
@@ -102,12 +137,12 @@ class Program:
 
         Returns:
             The parent program object.
-            
+
             update function 1.2
         """
         references = id.split(".")
         return self.get_program(".".join(references[:-1]))
-    
+
     def get_variable(self, id: str) -> dict:
         references = id.split('.')
         program = self.get_program(".".join(references[:-1]))
@@ -115,28 +150,27 @@ class Program:
         return variable
 
     def get(self, id: str = "") -> dict:
-            """
-            Retrieves a program or function based on the given ID.
+        """
+        Retrieves a program or function based on the given ID.
 
-            Args:
-                id (str): The ID of the program or function to retrieve.
+        Args:
+            id (str): The ID of the program or function to retrieve.
 
-            Returns:
-                str or dict: The program or function corresponding to the given ID.
-            """
-            if id == "":  # return the root program
-                return self.properties
-            # if the first char of id is an alphabet, then we should call get_variable
-            if id[0].isalpha():
-                return self.get_variable(id[1:])
-            references = id.split('.')
-            program = self.get_program(".".join(references[:-1]))
-            program = program["functions"][int(references[-1]) - 1]
-            if "program" in program:
-                return program["program"]
-            else:
-                return program
-
+        Returns:
+            str or dict: The program or function corresponding to the given ID.
+        """
+        if id == "":  # return the root program
+            return self.properties
+        # if the first char of id is an alphabet, then we should call get_variable
+        if id[0].isalpha():
+            return self.get_variable(id[1:])
+        references = id.split('.')
+        program = self.get_program(".".join(references[:-1]))
+        program = program["functions"][int(references[-1]) - 1]
+        if "program" in program:
+            return program["program"]
+        else:
+            return program
 
     def add_program(self, new_program, id: str = ""):
         """
@@ -324,7 +358,7 @@ class Program:
         program = self.get(".".join(references[:-1]))
         ix = int(references[-1]) - 1
         program["variables"][ix].update(item)
-        
+
     @download_on_change
     def update(self, type: str, item, id: str = ""):
         """
@@ -341,7 +375,7 @@ class Program:
         Returns:
         - None
         """
-        item  = copy.deepcopy(item)
+        item = copy.deepcopy(item)
         if type == "program":
             self.update_program(item, id)
         elif type == "function":

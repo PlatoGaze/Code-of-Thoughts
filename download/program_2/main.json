@@ -1,0 +1,31 @@
+{
+    "name": "program_2",
+    "variables": [
+        {
+            "name": "variable_1",
+            "value": 1,
+            "type": "inputFieldValue",
+            "id": 1
+        }
+    ],
+    "functions": [
+        {
+            "id": 1,
+            "type": "standard",
+            "main": true,
+            "prompt": "Oh mighty god!",
+            "output_type": "string"
+        },
+        {
+            "id": 2,
+            "link": "program_1"
+        },
+        {
+            "id": 3,
+            "type": "standard",
+            "main": true,
+            "prompt": "What's your name?",
+            "output_type": "string"
+        }
+    ]
+}
