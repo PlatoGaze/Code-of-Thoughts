@@ -1,5 +1,6 @@
 import json
-
+import os
+import copy
 
 class Function:
     def __init__(self, function_dict: dict) -> None:
@@ -37,6 +38,28 @@ class Program:
     def is_valid(self, program_dict: dict):
         return True
 
+    def save_to_file(self):
+        directory = "download"
+        file_name = self.properties["name"]
+        file_path = f"{directory}/{file_name}.json"
+        # Create the 'download' directory if it doesn't exist
+        os.makedirs(directory, exist_ok=True)
+        with open(file_path, "w") as file:
+            json.dump(self.properties, file, indent=4)
+
+    def download_on_change(method):
+        """This method is a decorator for all methods that change the program object. It will automatically save the program to a file after the method is executed.
+
+        Args:
+            method (function): The method to be decorated.
+        """
+        def wrapper(self, *args, **kwargs):
+            result = method(self, *args, **kwargs)
+            self.save_to_file()
+            print("Program saved to file.")
+            return result
+        return wrapper
+
     def to_dict(self):
         """
         Converts the program object to a dictionary.
@@ -45,7 +68,8 @@ class Program:
             dict: A dictionary representation of the program object.
         """
         return self.properties.copy()
-
+    
+    
     def display(self):
         print(json.dumps(self.to_dict(), indent=4))
 
@@ -206,6 +230,7 @@ class Program:
 
         program["variables"].append(item)
 
+    @download_on_change
     def add(self, type: str, item, id: str = ""):
         """
         Adds an item of the specified type to the PlatoGaze object.
@@ -221,6 +246,7 @@ class Program:
         Returns:
         None
         """
+        item = copy.deepcopy(item)
         if type == "program":
             self.add_program(item, id)
         elif type == "function":
@@ -298,7 +324,8 @@ class Program:
         program = self.get(".".join(references[:-1]))
         ix = int(references[-1]) - 1
         program["variables"][ix].update(item)
-
+        
+    @download_on_change
     def update(self, type: str, item, id: str = ""):
         """
         Update the specified item based on the given type.
@@ -314,6 +341,7 @@ class Program:
         Returns:
         - None
         """
+        item  = copy.deepcopy(item)
         if type == "program":
             self.update_program(item, id)
         elif type == "function":
