@@ -49,7 +49,6 @@ class Program:
             "variable": self.update_variable
         }
         
-
     def is_valid(self, program_dict: dict):
         return True
 
@@ -402,7 +401,6 @@ def create_program(name: str = "undefined"):
         "functions": []
     })
 
-
 def create_function(function_dict: dict):
     return Function({
         "type": function_dict.get("type", "standard"),
@@ -411,7 +409,6 @@ def create_function(function_dict: dict):
         "output_type": function_dict.get("output_type", "string")
     })
 
-
 def create_variable(variable_dict: dict):
     return {
         "type": variable_dict.get("type", "inputFieldValue"),
@@ -419,14 +416,29 @@ def create_variable(variable_dict: dict):
         "value": variable_dict.get("value", "")
     }
 
+create_type_methods = {
+    "program": create_program,
+    "function": create_function,
+    "variable": create_variable
+}
 
-def create(type: str = "program", value: dict = {}):
-    if type == "program":
-        return create_program(value.get("name", "undefined"))
-    elif type == "function":
-        return create_function(value)
-    elif type == "variable":
-        return create_variable(value)
+def create(type: str = "program", value:dict = {}):
+    """
+    Creates a new item of the specified type.
+
+    Args:
+        type (str): The type of item to create. Valid values are "program", "function", and "variable".
+        value (dict): The initial values of the item.
+
+    Raises:
+        TypeError: If the type is unrecognized.
+
+    Returns:
+        The newly created item.
+    """
+    create_func = create_type_methods.get(type)
+    if create_func:
+        return create_func(value)
     else:
         raise TypeError("Unrecognized type: " + type)
 
