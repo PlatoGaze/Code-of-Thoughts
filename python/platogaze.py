@@ -422,7 +422,7 @@ create_type_methods = {
     "variable": create_variable
 }
 
-def create(type: str = "program", value:dict = {}):
+def create(type: str = "program", *args, **kwargs):
     """
     Creates a new item of the specified type.
 
@@ -438,7 +438,7 @@ def create(type: str = "program", value:dict = {}):
     """
     create_func = create_type_methods.get(type)
     if create_func:
-        return create_func(value)
+        return create_func(kwargs)
     else:
         raise TypeError("Unrecognized type: " + type)
 
