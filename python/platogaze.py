@@ -13,12 +13,25 @@ class Function:
     @staticmethod
     def is_valid(function_dict):
         # check whether the function dict contain keys: name, type, prompt, output_type
-        check_keys = ["name", "type", "prompt", "output_type"]
-        for key in check_keys:
-            if key not in function_dict:
-                raise ValueError(
-                    f"Invalid function format: missing key: {key}. Function dict: {function_dict}")
-                return False
+        if function_dict['type'] == 'standard':
+            check_keys = ["name", "prompt", "output_type"]
+            for key in check_keys:
+                if key not in function_dict:
+                    raise ValueError(
+                        f"Invalid function format: missing key: {key}\nfunction: {function_dict}")
+        elif function_dict['type'] == 'switch':
+            check_keys = ["name", "output_type", "cases"]
+            for key in check_keys:
+                if key not in function_dict:
+                    raise ValueError(
+                        f"Invalid function format: missing key: {key}\nfunction name: {function_dict['name']}")
+            for case in function_dict['cases']:
+                check_keys = ['value', 'program']
+                for key in check_keys:
+                    if key not in case:
+                        raise ValueError(
+                            f"Invalid function format: missing key: {key}\nfunction_name: {function_dict['name']}")
+
         return True
 
     def to_dict(self):
@@ -57,13 +70,16 @@ class Program:
             "variable": self.update_variable
         }
 
+        self.save_to_file()
+        print("Program: " + self.properties['name'] + " saved to file.")
+
     @staticmethod
     def is_valid(program_dict: dict):
         check_keys = ["name", "variables", "functions"]
         for key in check_keys:
             if key not in program_dict:
-                raise ValueError(f"Invalid program format: missing key: {key}")
-                return False
+                raise ValueError("Invalid program format: missing key: " +
+                                 key + "\nprogram name: " + program_dict['name'])
 
         variable_keys = ["type", "name", "value"]
         variable_types = ["input", "url", "fixed", "note", "function_output"]
@@ -71,11 +87,10 @@ class Program:
             for key in variable_keys:
                 if key not in variable:
                     raise ValueError(
-                        f"Invalid variable format: missing key: {key}")
-                    return False
+                        "Invalid variable format: missing key:" + key + "\nprogram name: " + program_dict['name'])
             if variable["type"] not in variable_types:
-                raise ValueError(f"Invalid variable type: {variable['type']}")
-                return False
+                raise ValueError(
+                    "Invalid variable type: " + variable['type'] + "\nprogram name:" + program_dict['name'])
 
         for function in program_dict.get("functions", []):
             if function.get("type") == "program":
@@ -155,7 +170,8 @@ class Program:
         """
         return self.properties.copy()
 
-    def display(self):
+    def display(self, msg=""):
+        print(msg)
         print(json.dumps(self.to_dict(), indent=4))
 
     def get_program(self, id: str = "1"):
@@ -429,32 +445,41 @@ class Program:
             update_func(item, id)
         else:
             raise TypeError("Unrecognized type: " + type)
-        
+
+    @staticmethod
+    def replace_variables(prompt: str, variables: list):
+        for variable in variables:
+            prompt = prompt.replace(f"[{variable['name']}]", variable['value'])
+        # if there is still [] quoted part in the prompt, warn the user about possibly incorrect reference
+        if "[" in prompt or "]" in prompt:
+            print("Warning: there might be incorrect reference in the prompt: " + prompt)
+        return prompt
+
     def run_function(self, function_dict: dict, variables):
         # in the prompt of a function, reference to variables are quoted in [], so before calling the language model, we need to replace the reference with the actual value
         # for example, if the prompt is "Hello [name]", and the value of name is "John", then the prompt should be "Hello John"
+        prompt = Program.replace_variables(function_dict["prompt"], variables)
         if (function_dict["type"] == "standard"):
-            prompt = function_dict["prompt"]
-            for variable in variables:
-                prompt = prompt.replace(f"[{variable['name']}]", variable['value'])
-            # if there is still [] quoted part in the prompt, warn the user about possibly incorrect reference
-            if "[" in prompt or "]" in prompt:
-                print("Warning: there might be incorrect reference in the prompt: " + prompt)
             answer = fake_api_call(prompt)
             print("----------------------------------------------")
-            print("Function: " + function_dict['name'] + "\nPrompt: " + prompt + "\nAnswer: " + answer)
+            print("Function: " + function_dict['name'] +
+                  "\nPrompt: " + prompt + "\nAnswer: " + answer)
             print("----------------------------------------------")
             function_dict["answer"] = answer
+        elif (function_dict["type"] == "switch"):
+            pass
         else:
-            print("Error: unrecognized function type: " + function_dict["type"])
-        
+            print("Error: unrecognized function type: " +
+                  function_dict["type"])
+
     def run_program(self, program_dict: dict):
         for function_or_program in program_dict["functions"]:
             if function_or_program["type"] == "program":
                 self.run_program(function_or_program["program"])
             else:
-                self.run_function(function_or_program, program_dict["variables"])
-    
+                self.run_function(function_or_program,
+                                  program_dict["variables"])
+
     def run(self):
         """
         Runs the program.
@@ -467,7 +492,9 @@ class Program:
             if function_or_program["type"] == "program":
                 self.run_program(function_or_program["program"])
             else:
-                self.run_function(function_or_program, program_dict["variables"])
+                self.run_function(function_or_program,
+                                  program_dict["variables"])
+
 
 def create_program(*args, **kwargs):
     return Program({
@@ -493,7 +520,6 @@ def create_variable(*args, **kwargs):
         "name": kwargs.get("name", "undefined"),
         "value": kwargs.get("value", "")
     }
-
 
 
 create_type_methods = {
@@ -524,6 +550,25 @@ def create(type: str = "program", *args, **kwargs):
         raise TypeError("Unrecognized type: " + type)
 
 
+def link_to_program(program_dict: dict):
+    # traverse the functions in program_dict, if the function is program, go recursive; if not, if we encounter a key named 'program' and the corresponding value is a str instead of a dict, then we should link it to the corresponding program. The linked program should be found in local folder with the same name.json
+    for function in program_dict["functions"]:
+        if function["type"] == "program":
+            link_to_program(function["program"])
+        elif function['type'] == 'switch':
+            for item in function['cases']:
+                if isinstance(item['program'], str) and item['program'] != '':
+                    file_path = item['program'] + '.json'
+                    with open(file_path, 'r') as file:
+                        data = json.load(file)
+                    item['program'] = data
+                    link_to_program(item['program'])
+                elif item['program'] == "":
+                    empty_program = create_program(name="empty").to_dict()
+                    item['program'] = empty_program
+    return program_dict
+
+
 def load_from_json(file_path: str) -> Program:
     """
     Load data from a JSON file and return a Program object.
@@ -536,7 +581,9 @@ def load_from_json(file_path: str) -> Program:
     """
     with open(file_path, "r") as file:
         data = json.load(file)
+    link_to_program(data)
     return Program(data)
+
 
 def fake_api_call(prompt: str):
     return "This is a fake api call."

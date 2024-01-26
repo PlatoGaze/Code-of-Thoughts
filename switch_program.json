@@ -1,5 +1,5 @@
 {
-    "name": "swtich_program",
+    "name": "switch_program",
     "variables": [
         {
             "id": 1,
@@ -26,6 +26,7 @@
             "type": "switch",
             "main": true,
             "output_type": "string",
+            "name": "switch-with-country",
             "condition": "country",
             "cases":[
                 {
