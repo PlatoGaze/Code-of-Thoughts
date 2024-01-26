@@ -1,0 +1,46 @@
+{
+    "name": "swtich_program",
+    "variables": [
+        {
+            "id": 1,
+            "name": "china",
+            "type": "input",
+            "value": "china"
+        },
+        {
+            "id": 2,
+            "name":"america",
+            "type": "fixed",
+            "value": "america"
+        },
+        {
+            "id": 3,
+            "name":"country",
+            "type": "input",
+            "value": "china"
+        }
+    ],
+    "functions": [
+        {
+            "id": 1,
+            "type": "switch",
+            "main": true,
+            "output_type": "string",
+            "condition": "country",
+            "cases":[
+                {
+                    "value": "china",
+                    "program": "case_1"
+                },
+                {
+                    "value": "america",
+                    "program": "case_2"
+                },
+                {
+                    "value": "default",
+                    "program": ""
+                }
+            ]
+        }
+    ]
+}

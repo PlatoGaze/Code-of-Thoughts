@@ -16,7 +16,8 @@ class Function:
         check_keys = ["name", "type", "prompt", "output_type"]
         for key in check_keys:
             if key not in function_dict:
-                raise ValueError(f"Invalid function format: missing key: {key}")
+                raise ValueError(
+                    f"Invalid function format: missing key: {key}. Function dict: {function_dict}")
                 return False
         return True
 
@@ -43,19 +44,19 @@ class Program:
             self.properties = program_dict
         else:
             raise ValueError("Invalid program format")
-        
+
         self.add_type_methods = {
             "program": self.add_program,
             "function": self.add_function,
             "variable": self.add_variable
         }
-        
+
         self.update_type_methods = {
             "program": self.update_program,
             "function": self.update_function,
             "variable": self.update_variable
         }
-        
+
     @staticmethod
     def is_valid(program_dict: dict):
         check_keys = ["name", "variables", "functions"]
@@ -63,18 +64,19 @@ class Program:
             if key not in program_dict:
                 raise ValueError(f"Invalid program format: missing key: {key}")
                 return False
-    
+
         variable_keys = ["type", "name", "value"]
         variable_types = ["input", "url", "fixed", "note", "function_output"]
         for variable in program_dict.get("variables", []):
             for key in variable_keys:
                 if key not in variable:
-                    raise ValueError(f"Invalid variable format: missing key: {key}")
+                    raise ValueError(
+                        f"Invalid variable format: missing key: {key}")
                     return False
             if variable["type"] not in variable_types:
                 raise ValueError(f"Invalid variable type: {variable['type']}")
                 return False
-        
+
         for function in program_dict.get("functions", []):
             if function.get("type") == "program":
                 if not Program.is_valid(function["program"]):
@@ -82,7 +84,7 @@ class Program:
             else:
                 if not Function(function).is_valid(function):
                     return False
-        
+
         return True
 
     def save_to_file(self):
@@ -91,7 +93,7 @@ class Program:
         except KeyError:
             print("Error: 'name' key not found in properties.")
             return
-        
+
         directory = "download"
         # Create a folder named after the program name inside the 'download' folder
         program_folder = os.path.join(directory, program_name)
@@ -427,7 +429,45 @@ class Program:
             update_func(item, id)
         else:
             raise TypeError("Unrecognized type: " + type)
+        
+    def run_function(self, function_dict: dict, variables):
+        # in the prompt of a function, reference to variables are quoted in [], so before calling the language model, we need to replace the reference with the actual value
+        # for example, if the prompt is "Hello [name]", and the value of name is "John", then the prompt should be "Hello John"
+        if (function_dict["type"] == "standard"):
+            prompt = function_dict["prompt"]
+            for variable in variables:
+                prompt = prompt.replace(f"[{variable['name']}]", variable['value'])
+            # if there is still [] quoted part in the prompt, warn the user about possibly incorrect reference
+            if "[" in prompt or "]" in prompt:
+                print("Warning: there might be incorrect reference in the prompt: " + prompt)
+            answer = fake_api_call(prompt)
+            print("----------------------------------------------")
+            print("Function: " + function_dict['name'] + "\nPrompt: " + prompt + "\nAnswer: " + answer)
+            print("----------------------------------------------")
+            function_dict["answer"] = answer
+        else:
+            print("Error: unrecognized function type: " + function_dict["type"])
+        
+    def run_program(self, program_dict: dict):
+        for function_or_program in program_dict["functions"]:
+            if function_or_program["type"] == "program":
+                self.run_program(function_or_program["program"])
+            else:
+                self.run_function(function_or_program, program_dict["variables"])
+    
+    def run(self):
+        """
+        Runs the program.
 
+        Returns:
+            None
+        """
+        program_dict = self.properties
+        for function_or_program in program_dict["functions"]:
+            if function_or_program["type"] == "program":
+                self.run_program(function_or_program["program"])
+            else:
+                self.run_function(function_or_program, program_dict["variables"])
 
 def create_program(*args, **kwargs):
     return Program({
@@ -435,6 +475,7 @@ def create_program(*args, **kwargs):
         "variables": [],
         "functions": []
     })
+
 
 def create_function(*args, **kwargs):
     return Function({
@@ -445,6 +486,7 @@ def create_function(*args, **kwargs):
         "output_type": kwargs.get("output_type", "string")
     })
 
+
 def create_variable(*args, **kwargs):
     return {
         "type": kwargs.get("type", "input"),
@@ -452,11 +494,14 @@ def create_variable(*args, **kwargs):
         "value": kwargs.get("value", "")
     }
 
+
+
 create_type_methods = {
     "program": create_program,
     "function": create_function,
     "variable": create_variable
 }
+
 
 def create(type: str = "program", *args, **kwargs):
     """
@@ -480,6 +525,18 @@ def create(type: str = "program", *args, **kwargs):
 
 
 def load_from_json(file_path: str) -> Program:
+    """
+    Load data from a JSON file and return a Program object.
+
+    Args:
+        file_path (str): The path to the JSON file.
+
+    Returns:
+        Program: The Program object created from the JSON data.
+    """
     with open(file_path, "r") as file:
         data = json.load(file)
     return Program(data)
+
+def fake_api_call(prompt: str):
+    return "This is a fake api call."
