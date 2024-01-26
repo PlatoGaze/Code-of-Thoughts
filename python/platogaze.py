@@ -137,6 +137,8 @@ class Program:
 
         def wrapper(self, *args, **kwargs):
             result = method(self, *args, **kwargs)
+            # check validity when properties are changed
+            Program.is_valid(self.properties)
             self.save_to_file()
             print("Program saved to file.")
             return result
@@ -300,9 +302,9 @@ class Program:
         var_type = id[0]
 
         if var_type == 'i':
-            item['type'] = 'inputFieldValue'
+            item['type'] = 'input'
         elif var_type == 'u':
-            item['type'] = 'resourceURL'
+            item['type'] = 'url'
         else:
             raise ValueError(f"Invalid variable type: {var_type}")
 
@@ -392,9 +394,9 @@ class Program:
         var_type = id[0]
 
         if var_type == 'i':
-            item['type'] = 'inputFieldValue'
+            item['type'] = 'input'
         elif var_type == 'u':
-            item['type'] = 'resourceURL'
+            item['type'] = 'url'
         else:
             raise ValueError(f"Invalid variable type: {var_type}")
 
@@ -445,7 +447,7 @@ def create_function(*args, **kwargs):
 
 def create_variable(*args, **kwargs):
     return {
-        "type": kwargs.get("type", "inputFieldValue"),
+        "type": kwargs.get("type", "input"),
         "name": kwargs.get("name", "undefined"),
         "value": kwargs.get("value", "")
     }

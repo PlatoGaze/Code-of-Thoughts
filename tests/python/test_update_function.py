@@ -26,13 +26,13 @@ function_1.display()
 #         {
 #             "id": 1,
 #             "name": "country",
-#             "type": "inputFieldValue",
+#             "type": "input",
 #             "value": "china"
 #         },
 #         {
 #             "id": 2,
 #             "name": "google",
-#             "type": "resourceURL",
+#             "type": "url",
 #             "value": "www.google.com"
 #         }
 #     ],
@@ -46,13 +46,13 @@ function_1.display()
 #                     {
 #                         "id": 1,
 #                         "name": "country",
-#                         "type": "inputFieldValue",
+#                         "type": "input",
 #                         "value": "china"
 #                     },
 #                     {
 #                         "id": 2,
 #                         "name": "google",
-#                         "type": "resourceURL",
+#                         "type": "url",
 #                         "value": "www.google.com"
 #                     }
 #                 ],
@@ -97,13 +97,13 @@ program_1.display()
 #         {
 #             "id": 1,
 #             "name": "country",
-#             "type": "inputFieldValue",
+#             "type": "input",
 #             "value": "china"
 #         },
 #         {
 #             "id": 2,
 #             "name": "google",
-#             "type": "resourceURL",
+#             "type": "url",
 #             "value": "www.google.com"
 #         }
 #     ],
@@ -117,13 +117,13 @@ program_1.display()
 #                     {
 #                         "id": 1,
 #                         "name": "country",
-#                         "type": "inputFieldValue",
+#                         "type": "input",
 #                         "value": "china"
 #                     },
 #                     {
 #                         "id": 2,
 #                         "name": "google",
-#                         "type": "resourceURL",
+#                         "type": "url",
 #                         "value": "www.google.com"
 #                     }
 #                 ],
@@ -159,13 +159,13 @@ program_1.display()
 #         {
 #             "id": 1,
 #             "name": "country",
-#             "type": "inputFieldValue",
+#             "type": "input",
 #             "value": "china"
 #         },
 #         {
 #             "id": 2,
 #             "name": "google",
-#             "type": "resourceURL",
+#             "type": "url",
 #             "value": "www.google.com"
 #         }
 #     ],
@@ -179,13 +179,13 @@ program_1.display()
 #                     {
 #                         "id": 1,
 #                         "name": "country",
-#                         "type": "inputFieldValue",
+#                         "type": "input",
 #                         "value": "china"
 #                     },
 #                     {
 #                         "id": 2,
 #                         "name": "google",
-#                         "type": "resourceURL",
+#                         "type": "url",
 #                         "value": "www.google.com"
 #                     }
 #                 ],

@@ -14,7 +14,7 @@ program_2 = Program({
     "variables": [
         {
             "id": 1,
-            "type": "inputFieldValue",
+            "type": "input",
             "name": "uncle",
             "value": "Sam"
         }
