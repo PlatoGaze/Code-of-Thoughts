@@ -39,7 +39,7 @@
                         "id": 1,
                         "type": "standard",
                         "main": true,
-                        "prompt": "Reference from main [m0]",
+                        "prompt": "Reference from main [name]",
                         "output_type": "string"
                     }
                 ]

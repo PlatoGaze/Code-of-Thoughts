@@ -5,12 +5,19 @@ import copy
 
 class Function:
     def __init__(self, function_dict: dict) -> None:
-        if self.is_valid(function_dict):
+        if Function.is_valid(function_dict):
             self.properties = function_dict
         else:
-            raise ValueError("Invalid funtion format")
+            raise ValueError("Invalid function format")
 
-    def is_valid(self, function_dict):
+    @staticmethod
+    def is_valid(function_dict):
+        # check whether the function dict contain keys: name, type, prompt, output_type
+        check_keys = ["name", "type", "prompt", "output_type"]
+        for key in check_keys:
+            if key not in function_dict:
+                raise ValueError(f"Invalid function format: missing key: {key}")
+                return False
         return True
 
     def to_dict(self):
@@ -32,7 +39,7 @@ class Program:
             ValueError: If the program format is invalid.
         """
         program_dict = copy.deepcopy(program_dict)
-        if self.is_valid(program_dict):
+        if Program.is_valid(program_dict):
             self.properties = program_dict
         else:
             raise ValueError("Invalid program format")
@@ -49,7 +56,33 @@ class Program:
             "variable": self.update_variable
         }
         
-    def is_valid(self, program_dict: dict):
+    @staticmethod
+    def is_valid(program_dict: dict):
+        check_keys = ["name", "variables", "functions"]
+        for key in check_keys:
+            if key not in program_dict:
+                raise ValueError(f"Invalid program format: missing key: {key}")
+                return False
+    
+        variable_keys = ["type", "name", "value"]
+        variable_types = ["input", "url", "fixed", "note", "function_output"]
+        for variable in program_dict.get("variables", []):
+            for key in variable_keys:
+                if key not in variable:
+                    raise ValueError(f"Invalid variable format: missing key: {key}")
+                    return False
+            if variable["type"] not in variable_types:
+                raise ValueError(f"Invalid variable type: {variable['type']}")
+                return False
+        
+        for function in program_dict.get("functions", []):
+            if function.get("type") == "program":
+                if not Program.is_valid(function["program"]):
+                    return False
+            else:
+                if not Function(function).is_valid(function):
+                    return False
+        
         return True
 
     def save_to_file(self):
@@ -394,26 +427,27 @@ class Program:
             raise TypeError("Unrecognized type: " + type)
 
 
-def create_program(name: str = "undefined"):
+def create_program(*args, **kwargs):
     return Program({
-        "name": name,
+        "name": kwargs.get("name", "undefined"),
         "variables": [],
         "functions": []
     })
 
-def create_function(function_dict: dict):
+def create_function(*args, **kwargs):
     return Function({
-        "type": function_dict.get("type", "standard"),
-        "main": function_dict.get("main", True),
-        "prompt": function_dict.get("prompt", ""),
-        "output_type": function_dict.get("output_type", "string")
+        "name": kwargs.get("name", "undefined"),
+        "type": kwargs.get("type", "standard"),
+        "main": kwargs.get("main", True),
+        "prompt": kwargs.get("prompt", ""),
+        "output_type": kwargs.get("output_type", "string")
     })
 
-def create_variable(variable_dict: dict):
+def create_variable(*args, **kwargs):
     return {
-        "type": variable_dict.get("type", "inputFieldValue"),
-        "name": variable_dict.get("name", "undefined"),
-        "value": variable_dict.get("value", "")
+        "type": kwargs.get("type", "inputFieldValue"),
+        "name": kwargs.get("name", "undefined"),
+        "value": kwargs.get("value", "")
     }
 
 create_type_methods = {
@@ -438,7 +472,7 @@ def create(type: str = "program", *args, **kwargs):
     """
     create_func = create_type_methods.get(type)
     if create_func:
-        return create_func(kwargs)
+        return create_func(**kwargs)
     else:
         raise TypeError("Unrecognized type: " + type)
 
