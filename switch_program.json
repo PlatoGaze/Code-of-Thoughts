@@ -9,15 +9,15 @@
         },
         {
             "id": 2,
-            "name":"america",
+            "name": "america",
             "type": "fixed",
             "value": "america"
         },
         {
             "id": 3,
-            "name":"country",
+            "name": "country",
             "type": "input",
-            "value": "china"
+            "value": "america"
         }
     ],
     "functions": [
@@ -28,7 +28,7 @@
             "output_type": "string",
             "name": "switch-with-country",
             "condition": "country",
-            "cases":[
+            "cases": [
                 {
                     "value": "china",
                     "program": "case_1"
@@ -39,7 +39,13 @@
                 },
                 {
                     "value": "default",
-                    "program": ""
+                    "program": {
+                        "type": "standard",
+                        "name": "default-behavior",
+                        "prompt": "3 references here: [country], [america], [china]",
+                        "main": true,
+                        "output_type": "string"
+                    }
                 }
             ]
         }

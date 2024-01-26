@@ -17,7 +17,7 @@
             "id": 3,
             "name": "country",
             "type": "input",
-            "value": "china"
+            "value": "america"
         }
     ],
     "functions": [
@@ -44,6 +44,7 @@
                         "functions": [
                             {
                                 "id": 1,
+                                "name": "anminal",
                                 "type": "standard",
                                 "prompt": "Reference from input: [anminal]",
                                 "main": true,
@@ -68,6 +69,7 @@
                             {
                                 "id": 1,
                                 "type": "standard",
+                                "name": "drink",
                                 "prompt": "Reference from input: [drink]",
                                 "main": true,
                                 "output_type": "string"
@@ -78,9 +80,11 @@
                 {
                     "value": "default",
                     "program": {
-                        "name": "empty",
-                        "variables": [],
-                        "functions": []
+                        "type": "standard",
+                        "name": "default-behavior",
+                        "prompt": "3 references here: [country], [america], [china]",
+                        "main": true,
+                        "output_type": "string"
                     }
                 }
             ]

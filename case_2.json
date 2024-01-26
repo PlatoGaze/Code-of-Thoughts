@@ -12,6 +12,7 @@
         {
             "id": 1,
             "type": "standard",
+            "name": "drink",
             "prompt": "Reference from input: [drink]",
             "main": true,
             "output_type": "string"

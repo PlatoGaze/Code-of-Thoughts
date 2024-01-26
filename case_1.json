@@ -11,6 +11,7 @@
     "functions": [
         {
             "id": 1,
+            "name": "anminal",
             "type": "standard",
             "prompt": "Reference from input: [anminal]",
             "main": true,

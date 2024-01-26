@@ -458,8 +458,9 @@ class Program:
     def run_function(self, function_dict: dict, variables):
         # in the prompt of a function, reference to variables are quoted in [], so before calling the language model, we need to replace the reference with the actual value
         # for example, if the prompt is "Hello [name]", and the value of name is "John", then the prompt should be "Hello John"
-        prompt = Program.replace_variables(function_dict["prompt"], variables)
+
         if (function_dict["type"] == "standard"):
+            prompt = Program.replace_variables(function_dict["prompt"], variables)
             answer = fake_api_call(prompt)
             print("----------------------------------------------")
             print("Function: " + function_dict['name'] +
@@ -467,7 +468,31 @@ class Program:
             print("----------------------------------------------")
             function_dict["answer"] = answer
         elif (function_dict["type"] == "switch"):
-            pass
+            condition_name = function_dict["condition"]
+            # traverse the variables list, find a variable whose name is condition_name
+            for variable in variables:
+                if variable["name"] == condition_name:
+                    condition_value = variable["value"]
+                    break
+            # traverse the cases list, find the case whose value is equal to condition_value
+            
+            run_default = True
+            for case in function_dict["cases"]:
+                if case["value"] == condition_value:
+                    run_default = False
+                    case_program = case["program"]
+                if (case['value'] == "default"):
+                    default_program = case["program"]    
+            # run the program in the case
+            if run_default:
+                case_program = default_program
+            
+            if 'type' not in case_program:
+                self.run_program(case_program)
+            else:
+                self.run_function(case_program, variables)
+
+
         else:
             print("Error: unrecognized function type: " +
                   function_dict["type"])
