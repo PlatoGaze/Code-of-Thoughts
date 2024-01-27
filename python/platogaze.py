@@ -12,7 +12,18 @@ class Function:
 
     @staticmethod
     def is_valid(function_dict):
-        # check whether the function dict contain keys: name, type, prompt, output_type
+        """
+        Check whether the function dictionary is valid.
+
+        Args:
+            function_dict (dict): The function dictionary to be validated.
+
+        Raises:
+            ValueError: If the function dictionary is missing required keys.
+
+        Returns:
+            bool: True if the function dictionary is valid, False otherwise.
+        """
         if function_dict['type'] == 'standard':
             check_keys = ["name", "prompt", "output_type"]
             for key in check_keys:
@@ -75,6 +86,18 @@ class Program:
 
     @staticmethod
     def is_valid(program_dict: dict):
+        """
+        Checks if the given program dictionary is valid.
+
+        Args:
+            program_dict (dict): The program dictionary to validate.
+
+        Raises:
+            ValueError: If the program dictionary is missing any required keys or has invalid variable types.
+
+        Returns:
+            bool: True if the program dictionary is valid, False otherwise.
+        """
         check_keys = ["name", "variables", "functions"]
         for key in check_keys:
             if key not in program_dict:
@@ -103,6 +126,18 @@ class Program:
         return True
 
     def save_to_file(self):
+        """
+        Saves the program data to files.
+
+        This method creates a folder named after the program name inside the 'download' folder.
+        It then saves the program data in JSON format to separate files, including main.json and any linked program files.
+
+        Raises:
+            KeyError: If the 'name' key is not found in the properties dictionary.
+
+        Returns:
+            None
+        """
         try:
             program_name = self.properties["name"]
         except KeyError:
@@ -210,6 +245,18 @@ class Program:
         return self.get_program(".".join(references[:-1]))
 
     def get_variable(self, id: str) -> dict:
+        """
+        Retrieves a variable from the program based on its ID.
+
+        Args:
+            id (str): The ID of the variable in the format "program.variable_index".
+
+        Returns:
+            dict: The variable object.
+
+        Raises:
+            IndexError: If the program or variable index is out of range.
+        """
         references = id.split('.')
         program = self.get_program(".".join(references[:-1]))
         variable = program["variables"][int(references[-1]) - 1]
@@ -405,9 +452,22 @@ class Program:
         program.update(new_function)
 
     def update_variable(self, item: dict, id: str = "i1"):
+        """
+        Updates a variable in the program based on the given item and ID.
+
+        Args:
+            item (dict): The dictionary containing the updated variable information.
+            id (str, optional): The ID of the variable to be updated. Defaults to "i1".
+
+        Raises:
+            TypeError: If the item is not a dictionary.
+            ValueError: If the variable type is invalid.
+
+        Returns:
+            None
+        """
         if not isinstance(item, dict):
-            raise TypeError(
-                f"Variable item should be a dictionary, instead it is {type(item)}.")
+            raise TypeError(f"Variable item should be a dictionary, instead it is {type(item)}.")
 
         var_type = id[0]
 
@@ -448,6 +508,16 @@ class Program:
 
     @staticmethod
     def replace_variables(prompt: str, variables: list):
+        """
+        Replaces variables in the given prompt with their corresponding values.
+
+        Args:
+            prompt (str): The prompt string containing variables to be replaced.
+            variables (list): A list of dictionaries, where each dictionary contains the name and value of a variable.
+
+        Returns:
+            str: The prompt string with variables replaced by their values.
+        """
         for variable in variables:
             prompt = prompt.replace(f"[{variable['name']}]", variable['value'])
         # if there is still [] quoted part in the prompt, warn the user about possibly incorrect reference
@@ -456,17 +526,29 @@ class Program:
         return prompt
 
     def run_function(self, function_dict: dict, variables):
+        """
+        Runs a function based on the provided function dictionary and variables.
+
+        Args:
+            function_dict (dict): A dictionary containing information about the function.
+            variables: The variables to be used in the function.
+
+        Returns:
+            None
+        """
         # in the prompt of a function, reference to variables are quoted in [], so before calling the language model, we need to replace the reference with the actual value
         # for example, if the prompt is "Hello [name]", and the value of name is "John", then the prompt should be "Hello John"
 
         if (function_dict["type"] == "standard"):
-            prompt = Program.replace_variables(function_dict["prompt"], variables)
+            prompt = Program.replace_variables(
+                function_dict["prompt"], variables)
             answer = fake_api_call(prompt)
             print("----------------------------------------------")
             print("Function: " + function_dict['name'] +
                   "\nPrompt: " + prompt + "\nAnswer: " + answer)
             print("----------------------------------------------")
             function_dict["answer"] = answer
+            
         elif (function_dict["type"] == "switch"):
             condition_name = function_dict["condition"]
             # traverse the variables list, find a variable whose name is condition_name
@@ -475,35 +557,71 @@ class Program:
                     condition_value = variable["value"]
                     break
             # traverse the cases list, find the case whose value is equal to condition_value
-            
+
             run_default = True
             for case in function_dict["cases"]:
                 if case["value"] == condition_value:
                     run_default = False
                     case_program = case["program"]
                 if (case['value'] == "default"):
-                    default_program = case["program"]    
+                    default_program = case["program"]
             # run the program in the case
             if run_default:
                 case_program = default_program
-            
+
             if 'type' not in case_program:
                 self.run_program(case_program)
             else:
                 self.run_function(case_program, variables)
-
-
+                
+        elif (function_dict["type"] == "while"):
+            variable_l = None
+            for variable in variables:
+                if variable['name'] == function_dict['condition_l']:
+                    variable_l = variable
+                    break
+            if variable_l is None:
+                raise ValueError("Error: condition_l ["+  function_dict['condition_l'] +"] is not found in variables list")
+            variable_r = None
+            for variable in variables:
+                if variable['name'] == function_dict['condition_r']:
+                    variable_r = variable
+                    break
+            if variable_r is None:
+                raise ValueError("Error: condition_r ["+  function_dict['condition_r'] +"] is not found in variables list")
+            
+            while (variable_l['value'] != variable_r['value']):
+                # assume body is a list of function
+                for function in function_dict['body']:
+                    self.run_function(function, variables)
+        
         else:
             print("Error: unrecognized function type: " +
                   function_dict["type"])
+            return
+        
+        if 'return' in function_dict and function_dict['return'] != "":
+            # change the corresponding variable's value
+            for variable in variables:
+                if variable['name'] == function_dict['return']:
+                    variable['value'] = function_dict['answer']
+                    break
 
     def run_program(self, program_dict: dict):
+        """
+        Recursively runs the program specified in the program_dict.
+
+        Args:
+            program_dict (dict): A dictionary containing the program to be executed.
+
+        Returns:
+            None
+        """
         for function_or_program in program_dict["functions"]:
             if function_or_program["type"] == "program":
                 self.run_program(function_or_program["program"])
             else:
-                self.run_function(function_or_program,
-                                  program_dict["variables"])
+                self.run_function(function_or_program, program_dict["variables"])
 
     def run(self):
         """
@@ -522,6 +640,16 @@ class Program:
 
 
 def create_program(*args, **kwargs):
+    """
+    Create a new program object.
+
+    Args:
+        *args: Variable length argument list.
+        **kwargs: Arbitrary keyword arguments.
+
+    Returns:
+        Program: The newly created program object.
+    """
     return Program({
         "name": kwargs.get("name", "undefined"),
         "variables": [],
@@ -530,6 +658,23 @@ def create_program(*args, **kwargs):
 
 
 def create_function(*args, **kwargs):
+    """
+    Create a new function object.
+
+    Args:
+        *args: Variable length arguments.
+        **kwargs: Keyword arguments.
+
+    Keyword Args:
+        name (str): The name of the function. Default is "undefined".
+        type (str): The type of the function. Default is "standard".
+        main (bool): Whether the function is the main function. Default is True.
+        prompt (str): The prompt for the function. Default is an empty string.
+        output_type (str): The output type of the function. Default is "string".
+
+    Returns:
+        Function: The created function object.
+    """
     return Function({
         "name": kwargs.get("name", "undefined"),
         "type": kwargs.get("type", "standard"),
@@ -540,6 +685,20 @@ def create_function(*args, **kwargs):
 
 
 def create_variable(*args, **kwargs):
+    """
+    Create a variable dictionary with the specified type, name, and value.
+
+    Args:
+        *args: Additional positional arguments (not used in this function).
+        **kwargs: Additional keyword arguments.
+            type (str): The type of the variable (default: "input").
+            name (str): The name of the variable (default: "undefined").
+            value (str): The value of the variable (default: "").
+
+    Returns:
+        dict: A dictionary representing the variable.
+
+    """
     return {
         "type": kwargs.get("type", "input"),
         "name": kwargs.get("name", "undefined"),
@@ -576,7 +735,15 @@ def create(type: str = "program", *args, **kwargs):
 
 
 def link_to_program(program_dict: dict):
-    # traverse the functions in program_dict, if the function is program, go recursive; if not, if we encounter a key named 'program' and the corresponding value is a str instead of a dict, then we should link it to the corresponding program. The linked program should be found in local folder with the same name.json
+    """
+    Recursively traverses the functions in the program_dict and links the programs.
+
+    Args:
+        program_dict (dict): The dictionary representing the program.
+
+    Returns:
+        dict: The updated program dictionary with linked programs.
+    """
     for function in program_dict["functions"]:
         if function["type"] == "program":
             link_to_program(function["program"])
@@ -611,4 +778,16 @@ def load_from_json(file_path: str) -> Program:
 
 
 def fake_api_call(prompt: str):
-    return "This is a fake api call."
+    """
+    This function simulates an API call and returns a fake response.
+
+    Args:
+        prompt (str): The prompt for the API call.
+
+    Returns:
+        str: The fake response from the API call.
+    """
+    return "This is a fake API call."
+def fake_api_call(prompt: str):
+    # let user input the answer
+    return input(prompt + "\ninput your answer here (default is \"This is a fake api call\"): ")
