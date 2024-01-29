@@ -1,6 +1,7 @@
 import json
 import os
 import copy
+import re
 
 
 class Function:
@@ -493,7 +494,7 @@ class Program:
                 run_function(function, self.program_dict["variables"])
 
     def _get_parent_id(self, id: str):
-        _check_is_string(id)
+        self._is_valid_id(id)
         last_dot_index = id.rfind(".")
         if last_dot_index == -1:
             raise ValueError("Invalid ID: Child ID must contain a '.' character")
@@ -502,8 +503,14 @@ class Program:
         return parent_id
 
     def _get_last_id_segment(self, id: str):
-        _check_is_string(id)
+        self._is_valid_id(id)
         return id.split(".")[-1]
+
+    def _is_valid_id(self, id: str):
+        _check_is_string(id)  # 假设这是一个检查 id 是否为字符串的函数
+        pattern = r"^\d+\.\d+\.\d+$"
+        if not re.match(pattern, id):
+            raise ValueError(f"Invalid ID format: {id}")
 
 
 def create_program(*args, **kwargs):
