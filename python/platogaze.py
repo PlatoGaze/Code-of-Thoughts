@@ -24,24 +24,27 @@ class Function:
         Returns:
             bool: True if the function dictionary is valid, False otherwise.
         """
-        if function_dict['type'] == 'standard':
+        if function_dict["type"] == "standard":
             check_keys = ["name", "prompt", "output_type"]
             for key in check_keys:
                 if key not in function_dict:
                     raise ValueError(
-                        f"Invalid function format: missing key: {key}\nfunction: {function_dict}")
-        elif function_dict['type'] == 'switch':
+                        f"Invalid function format: missing key: {key}\nfunction: {function_dict}"
+                    )
+        elif function_dict["type"] == "switch":
             check_keys = ["name", "output_type", "cases"]
             for key in check_keys:
                 if key not in function_dict:
                     raise ValueError(
-                        f"Invalid function format: missing key: {key}\nfunction name: {function_dict['name']}")
-            for case in function_dict['cases']:
-                check_keys = ['value', 'program']
+                        f"Invalid function format: missing key: {key}\nfunction name: {function_dict['name']}"
+                    )
+            for case in function_dict["cases"]:
+                check_keys = ["value", "program"]
                 for key in check_keys:
                     if key not in case:
                         raise ValueError(
-                            f"Invalid function format: missing key: {key}\nfunction_name: {function_dict['name']}")
+                            f"Invalid function format: missing key: {key}\nfunction_name: {function_dict['name']}"
+                        )
 
         return True
 
@@ -72,17 +75,17 @@ class Program:
         self.add_type_methods = {
             "program": self.add_program,
             "function": self.add_function,
-            "variable": self.add_variable
+            "variable": self.add_variable,
         }
 
         self.update_type_methods = {
             "program": self.update_program,
             "function": self.update_function,
-            "variable": self.update_variable
+            "variable": self.update_variable,
         }
 
         self.save_to_file()
-        print("Program: " + self.properties['name'] + " saved to file.")
+        print("Program: " + self.properties["name"] + " saved to file.")
 
     @staticmethod
     def is_valid(program_dict: dict):
@@ -101,8 +104,12 @@ class Program:
         check_keys = ["name", "variables", "functions"]
         for key in check_keys:
             if key not in program_dict:
-                raise ValueError("Invalid program format: missing key: " +
-                                 key + "\nprogram name: " + program_dict['name'])
+                raise ValueError(
+                    "Invalid program format: missing key: "
+                    + key
+                    + "\nprogram name: "
+                    + program_dict["name"]
+                )
 
         variable_keys = ["type", "name", "value"]
         variable_types = ["input", "url", "fixed", "note", "function_output"]
@@ -110,10 +117,18 @@ class Program:
             for key in variable_keys:
                 if key not in variable:
                     raise ValueError(
-                        "Invalid variable format: missing key:" + key + "\nprogram name: " + program_dict['name'])
+                        "Invalid variable format: missing key:"
+                        + key
+                        + "\nprogram name: "
+                        + program_dict["name"]
+                    )
             if variable["type"] not in variable_types:
                 raise ValueError(
-                    "Invalid variable type: " + variable['type'] + "\nprogram name:" + program_dict['name'])
+                    "Invalid variable type: "
+                    + variable["type"]
+                    + "\nprogram name:"
+                    + program_dict["name"]
+                )
 
         for function in program_dict.get("functions", []):
             if function.get("type") == "program":
@@ -154,7 +169,7 @@ class Program:
         main_data = {
             "name": program_name,
             "variables": self.properties.get("variables", []),
-            "functions": []
+            "functions": [],
         }
 
         # Traverse self.properties["functions"]
@@ -162,12 +177,15 @@ class Program:
             if function_data.get("type") == "program":
                 # If it's a program type, create a link
                 program_data = {
-                    "id": function_data["id"], "program": function_data["program"]["name"]}
+                    "id": function_data["id"],
+                    "program": function_data["program"]["name"],
+                }
                 main_data["functions"].append(program_data)
 
                 # Save the program data in a separate file
                 program_json_path = os.path.join(
-                    program_folder, function_data["program"]["name"] + ".json")
+                    program_folder, function_data["program"]["name"] + ".json"
+                )
                 with open(program_json_path, "w") as program_file:
                     json.dump(function_data["program"], program_file, indent=4)
             else:
@@ -194,6 +212,7 @@ class Program:
             self.save_to_file()
             print("Program saved to file.")
             return result
+
         return wrapper
 
     def to_dict(self):
@@ -219,7 +238,7 @@ class Program:
         Returns:
             `dict`: The program corresponding to the given ID.
         """
-        references = id.split('.')
+        references = id.split(".")
         if id == "":
             return self.properties
 
@@ -239,10 +258,9 @@ class Program:
         Returns:
             The parent program object.
 
-            update function 1.2
         """
-        references = id.split(".")
-        return self.get_program(".".join(references[:-1]))
+        parent_id = self.__get_parent_id(id)
+        return self.get_program(parent_id)
 
     def get_variable(self, id: str) -> dict:
         """
@@ -257,7 +275,7 @@ class Program:
         Raises:
             IndexError: If the program or variable index is out of range.
         """
-        references = id.split('.')
+        references = id.split(".")
         program = self.get_program(".".join(references[:-1]))
         variable = program["variables"][int(references[-1]) - 1]
         return variable
@@ -278,7 +296,7 @@ class Program:
         # if the first char of id is an alphabet, then we should call get_variable
         if id[0].isalpha():
             return self.get_variable(id[1:])
-        references = id.split('.')
+        references = id.split(".")
         program = self.get_program(".".join(references[:-1]))
         program = program["functions"][int(references[-1]) - 1]
         if "program" in program:
@@ -307,14 +325,13 @@ class Program:
             new_program = Program(new_program)
             new_program = new_program.to_dict()
         else:
-            raise TypeError("Invalid type: " + type(new_program) +
-                            ", should be a Program or dict")
+            raise TypeError(
+                "Invalid type: " + type(new_program) + ", should be a Program or dict"
+            )
         new_id = len(program["functions"]) + 1
-        program["functions"].append({
-            "id": new_id,
-            "type": "program",
-            "program": new_program
-        })
+        program["functions"].append(
+            {"id": new_id, "type": "program", "program": new_program}
+        )
 
     def add_function(self, new_function, id: str):
         """
@@ -337,13 +354,11 @@ class Program:
             new_function = Function(new_function)
             new_function = new_function.to_dict()
         else:
-            raise TypeError("Invalid type: " + type(new_function) +
-                            ", should be a Function or dict")
+            raise TypeError(
+                "Invalid type: " + type(new_function) + ", should be a Function or dict"
+            )
         new_id = len(program["functions"]) + 1
-        program["functions"].append({
-            "id": new_id,
-            **new_function
-        })
+        program["functions"].append({"id": new_id, **new_function})
 
     def add_variable(self, item: dict, id: str):
         """
@@ -362,19 +377,20 @@ class Program:
         """
         if not isinstance(item, dict):
             raise TypeError(
-                f"Variable item should be a dictionary, instead it is {type(item)}.")
+                f"Variable item should be a dictionary, instead it is {type(item)}."
+            )
 
         var_type = id[0]
 
-        if var_type == 'i':
-            item['type'] = 'input'
-        elif var_type == 'u':
-            item['type'] = 'url'
+        if var_type == "i":
+            item["type"] = "input"
+        elif var_type == "u":
+            item["type"] = "url"
         else:
             raise ValueError(f"Invalid variable type: {var_type}")
 
         program = self.read(id[1:])
-        item['id'] = len(program["variables"]) + 1
+        item["id"] = len(program["variables"]) + 1
 
         program["variables"].append(item)
 
@@ -421,8 +437,9 @@ class Program:
             new_program = Program(new_program)
             new_program = new_program.to_dict()
         else:
-            raise TypeError("Invalid type: " + type(new_program) +
-                            ", should be a Program or dict")
+            raise TypeError(
+                "Invalid type: " + type(new_program) + ", should be a Program or dict"
+            )
         original = self.read(id)
         original.update(new_program)
 
@@ -447,8 +464,9 @@ class Program:
             new_function = Function(new_function)
             new_function = new_function.to_dict()
         else:
-            raise TypeError("Invalid type: " + type(new_function) +
-                            ", should be a Function or dict")
+            raise TypeError(
+                "Invalid type: " + type(new_function) + ", should be a Function or dict"
+            )
         program.update(new_function)
 
     def update_variable(self, item: dict, id: str = "i1"):
@@ -467,14 +485,16 @@ class Program:
             None
         """
         if not isinstance(item, dict):
-            raise TypeError(f"Variable item should be a dictionary, instead it is {type(item)}.")
+            raise TypeError(
+                f"Variable item should be a dictionary, instead it is {type(item)}."
+            )
 
         var_type = id[0]
 
-        if var_type == 'i':
-            item['type'] = 'input'
-        elif var_type == 'u':
-            item['type'] = 'url'
+        if var_type == "i":
+            item["type"] = "input"
+        elif var_type == "u":
+            item["type"] = "url"
         else:
             raise ValueError(f"Invalid variable type: {var_type}")
 
@@ -519,10 +539,12 @@ class Program:
             str: The prompt string with variables replaced by their values.
         """
         for variable in variables:
-            prompt = prompt.replace(f"[{variable['name']}]", variable['value'])
+            prompt = prompt.replace(f"[{variable['name']}]", variable["value"])
         # if there is still [] quoted part in the prompt, warn the user about possibly incorrect reference
         if "[" in prompt or "]" in prompt:
-            print("Warning: there might be incorrect reference in the prompt: " + prompt)
+            print(
+                "Warning: there might be incorrect reference in the prompt: " + prompt
+            )
         return prompt
 
     def run_function(self, function_dict: dict, variables):
@@ -539,17 +561,22 @@ class Program:
         # in the prompt of a function, reference to variables are quoted in [], so before calling the language model, we need to replace the reference with the actual value
         # for example, if the prompt is "Hello [name]", and the value of name is "John", then the prompt should be "Hello John"
 
-        if (function_dict["type"] == "standard"):
-            prompt = Program.replace_variables(
-                function_dict["prompt"], variables)
+        if function_dict["type"] == "standard":
+            prompt = Program.replace_variables(function_dict["prompt"], variables)
             answer = fake_api_call(prompt)
             print("----------------------------------------------")
-            print("Function: " + function_dict['name'] +
-                  "\nPrompt: " + prompt + "\nAnswer: " + answer)
+            print(
+                "Function: "
+                + function_dict["name"]
+                + "\nPrompt: "
+                + prompt
+                + "\nAnswer: "
+                + answer
+            )
             print("----------------------------------------------")
             function_dict["answer"] = answer
-            
-        elif (function_dict["type"] == "switch"):
+
+        elif function_dict["type"] == "switch":
             condition_name = function_dict["condition"]
             # traverse the variables list, find a variable whose name is condition_name
             for variable in variables:
@@ -563,48 +590,55 @@ class Program:
                 if case["value"] == condition_value:
                     run_default = False
                     case_program = case["program"]
-                if (case['value'] == "default"):
+                if case["value"] == "default":
                     default_program = case["program"]
             # run the program in the case
             if run_default:
                 case_program = default_program
 
-            if 'type' not in case_program:
+            if "type" not in case_program:
                 self.run_program(case_program)
             else:
                 self.run_function(case_program, variables)
-                
-        elif (function_dict["type"] == "while"):
+
+        elif function_dict["type"] == "while":
             variable_l = None
             for variable in variables:
-                if variable['name'] == function_dict['condition_l']:
+                if variable["name"] == function_dict["condition_l"]:
                     variable_l = variable
                     break
             if variable_l is None:
-                raise ValueError("Error: condition_l ["+  function_dict['condition_l'] +"] is not found in variables list")
+                raise ValueError(
+                    "Error: condition_l ["
+                    + function_dict["condition_l"]
+                    + "] is not found in variables list"
+                )
             variable_r = None
             for variable in variables:
-                if variable['name'] == function_dict['condition_r']:
+                if variable["name"] == function_dict["condition_r"]:
                     variable_r = variable
                     break
             if variable_r is None:
-                raise ValueError("Error: condition_r ["+  function_dict['condition_r'] +"] is not found in variables list")
-            
-            while (variable_l['value'] != variable_r['value']):
+                raise ValueError(
+                    "Error: condition_r ["
+                    + function_dict["condition_r"]
+                    + "] is not found in variables list"
+                )
+
+            while variable_l["value"] != variable_r["value"]:
                 # assume body is a list of function
-                for function in function_dict['body']:
+                for function in function_dict["body"]:
                     self.run_function(function, variables)
-        
+
         else:
-            print("Error: unrecognized function type: " +
-                  function_dict["type"])
+            print("Error: unrecognized function type: " + function_dict["type"])
             return
-        
-        if 'return' in function_dict and function_dict['return'] != "":
+
+        if "return" in function_dict and function_dict["return"] != "":
             # change the corresponding variable's value
             for variable in variables:
-                if variable['name'] == function_dict['return']:
-                    variable['value'] = function_dict['answer']
+                if variable["name"] == function_dict["return"]:
+                    variable["value"] = function_dict["answer"]
                     break
 
     def run_program(self, program_dict: dict):
@@ -635,8 +669,15 @@ class Program:
             if function_or_program["type"] == "program":
                 self.run_program(function_or_program["program"])
             else:
-                self.run_function(function_or_program,
-                                  program_dict["variables"])
+                self.run_function(function_or_program, program_dict["variables"])
+
+    def __get_parent_id(self, id: str):
+        __check_is_string(id)
+        last_dot_index = id.rfind(".")
+        if last_dot_index == -1:
+            raise ValueError("Invalid ID: ID must contain a '.' character")
+
+        parent_id = id[:last_dot_index]
 
 
 def create_program(*args, **kwargs):
@@ -650,11 +691,9 @@ def create_program(*args, **kwargs):
     Returns:
         Program: The newly created program object.
     """
-    return Program({
-        "name": kwargs.get("name", "undefined"),
-        "variables": [],
-        "functions": []
-    })
+    return Program(
+        {"name": kwargs.get("name", "undefined"), "variables": [], "functions": []}
+    )
 
 
 def create_function(*args, **kwargs):
@@ -675,13 +714,15 @@ def create_function(*args, **kwargs):
     Returns:
         Function: The created function object.
     """
-    return Function({
-        "name": kwargs.get("name", "undefined"),
-        "type": kwargs.get("type", "standard"),
-        "main": kwargs.get("main", True),
-        "prompt": kwargs.get("prompt", ""),
-        "output_type": kwargs.get("output_type", "string")
-    })
+    return Function(
+        {
+            "name": kwargs.get("name", "undefined"),
+            "type": kwargs.get("type", "standard"),
+            "main": kwargs.get("main", True),
+            "prompt": kwargs.get("prompt", ""),
+            "output_type": kwargs.get("output_type", "string"),
+        }
+    )
 
 
 def create_variable(*args, **kwargs):
@@ -702,14 +743,14 @@ def create_variable(*args, **kwargs):
     return {
         "type": kwargs.get("type", "input"),
         "name": kwargs.get("name", "undefined"),
-        "value": kwargs.get("value", "")
+        "value": kwargs.get("value", ""),
     }
 
 
 create_type_methods = {
     "program": create_program,
     "function": create_function,
-    "variable": create_variable
+    "variable": create_variable,
 }
 
 
@@ -747,17 +788,17 @@ def link_to_program(program_dict: dict):
     for function in program_dict["functions"]:
         if function["type"] == "program":
             link_to_program(function["program"])
-        elif function['type'] == 'switch':
-            for item in function['cases']:
-                if isinstance(item['program'], str) and item['program'] != '':
-                    file_path = item['program'] + '.json'
-                    with open(file_path, 'r') as file:
+        elif function["type"] == "switch":
+            for item in function["cases"]:
+                if isinstance(item["program"], str) and item["program"] != "":
+                    file_path = item["program"] + ".json"
+                    with open(file_path, "r") as file:
                         data = json.load(file)
-                    item['program'] = data
-                    link_to_program(item['program'])
-                elif item['program'] == "":
+                    item["program"] = data
+                    link_to_program(item["program"])
+                elif item["program"] == "":
                     empty_program = create_program(name="empty").to_dict()
-                    item['program'] = empty_program
+                    item["program"] = empty_program
     return program_dict
 
 
@@ -788,6 +829,15 @@ def fake_api_call(prompt: str):
         str: The fake response from the API call.
     """
     return "This is a fake API call."
+
+
 def fake_api_call(prompt: str):
     # let user input the answer
-    return input(prompt + "\ninput your answer here (default is \"This is a fake api call\"): ")
+    return input(
+        prompt + '\ninput your answer here (default is "This is a fake api call"): '
+    )
+
+
+def __check_is_string(input):
+    if not isinstance(input, str):
+        raise TypeError("Expected a string")
