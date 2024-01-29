@@ -39,7 +39,7 @@
                         "id": 1,
                         "type": "standard",
                         "main": true,
-                        "prompt": "Reference from main [name]",
+                        "prompt": "Reference from main [country]",
                         "output_type": "string",
                         "name":"fun1"
                     }
@@ -49,7 +49,7 @@
         {
             "id": 2,
             "type": "standard",
-            "prompt": "Reference from input: [i0]",
+            "prompt": "Reference from input: [country]",
             "main": true,
             "output_type": "string",
             "name":"func2"

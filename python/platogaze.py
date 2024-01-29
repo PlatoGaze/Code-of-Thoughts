@@ -66,10 +66,8 @@ class Program:
         Raises:
             ValueError: If the program format is invalid.
         """
-        program_dict = copy.deepcopy(program_dict)
-        if Program.is_valid(program_dict):
-            self.program_dict = program_dict
-        else:
+        self.program_dict = copy.deepcopy(program_dict)
+        if not Program.is_valid(self.program_dict):
             raise ValueError("Invalid program format")
 
         self.add_type_methods = {
@@ -213,12 +211,6 @@ class Program:
         return wrapper
 
     def to_dict(self):
-        """
-        Converts the program object to a dictionary.
-
-        Returns:
-            dict: A dictionary representation of the program object.
-        """
         return self.program_dict.copy()
 
     def display(self, msg=""):
@@ -239,10 +231,10 @@ class Program:
         return self.get_program(parent_id)
 
     def get_variable(self, id: str) -> dict:
-        # program = self.get_parent_program(id)
-        # variable = program["variables"][]
-        # return variable
-        return 0
+        program = self.get_parent_program(id)
+        # print(self._get_last_id_segment(id))
+        variable = program["variables"][int(self._get_last_id_segment(id))]
+        return variable
 
     def read(self, id: str = "") -> dict:
         """
@@ -490,150 +482,15 @@ class Program:
         else:
             raise TypeError("Unrecognized type: " + type)
 
-    @staticmethod
-    def replace_variables(prompt: str, variables: list):
-        """
-        Replaces variables in the given prompt with their corresponding values.
-
-        Args:
-            prompt (str): The prompt string containing variables to be replaced.
-            variables (list): A list of dictionaries, where each dictionary contains the name and value of a variable.
-
-        Returns:
-            str: The prompt string with variables replaced by their values.
-        """
-        for variable in variables:
-            prompt = prompt.replace(f"[{variable['name']}]", variable["value"])
-        # if there is still [] quoted part in the prompt, warn the user about possibly incorrect reference
-        if "[" in prompt or "]" in prompt:
-            print(
-                "Warning: there might be incorrect reference in the prompt: " + prompt
-            )
-        return prompt
-
-    def run_function(self, function_dict: dict, variables):
-        """
-        Runs a function based on the provided function dictionary and variables.
-
-        Args:
-            function_dict (dict): A dictionary containing information about the function.
-            variables: The variables to be used in the function.
-
-        Returns:
-            None
-        """
-        # in the prompt of a function, reference to variables are quoted in [], so before calling the language model, we need to replace the reference with the actual value
-        # for example, if the prompt is "Hello [name]", and the value of name is "John", then the prompt should be "Hello John"
-
-        if function_dict["type"] == "standard":
-            prompt = Program.replace_variables(function_dict["prompt"], variables)
-            answer = fake_api_call(prompt)
-            print("----------------------------------------------")
-            print(
-                "Function: "
-                + function_dict["name"]
-                + "\nPrompt: "
-                + prompt
-                + "\nAnswer: "
-                + answer
-            )
-            print("----------------------------------------------")
-            function_dict["answer"] = answer
-
-        elif function_dict["type"] == "switch":
-            condition_name = function_dict["condition"]
-            # traverse the variables list, find a variable whose name is condition_name
-            for variable in variables:
-                if variable["name"] == condition_name:
-                    condition_value = variable["value"]
-                    break
-            # traverse the cases list, find the case whose value is equal to condition_value
-
-            run_default = True
-            for case in function_dict["cases"]:
-                if case["value"] == condition_value:
-                    run_default = False
-                    case_program = case["program"]
-                if case["value"] == "default":
-                    default_program = case["program"]
-            # run the program in the case
-            if run_default:
-                case_program = default_program
-
-            if "type" not in case_program:
-                self.run_program(case_program)
-            else:
-                self.run_function(case_program, variables)
-
-        elif function_dict["type"] == "while":
-            variable_l = None
-            for variable in variables:
-                if variable["name"] == function_dict["condition_l"]:
-                    variable_l = variable
-                    break
-            if variable_l is None:
-                raise ValueError(
-                    "Error: condition_l ["
-                    + function_dict["condition_l"]
-                    + "] is not found in variables list"
-                )
-            variable_r = None
-            for variable in variables:
-                if variable["name"] == function_dict["condition_r"]:
-                    variable_r = variable
-                    break
-            if variable_r is None:
-                raise ValueError(
-                    "Error: condition_r ["
-                    + function_dict["condition_r"]
-                    + "] is not found in variables list"
-                )
-
-            while variable_l["value"] != variable_r["value"]:
-                # assume body is a list of function
-                for function in function_dict["body"]:
-                    self.run_function(function, variables)
-
-        else:
-            print("Error: unrecognized function type: " + function_dict["type"])
-            return
-
-        if "return" in function_dict and function_dict["return"] != "":
-            # change the corresponding variable's value
-            for variable in variables:
-                if variable["name"] == function_dict["return"]:
-                    variable["value"] = function_dict["answer"]
-                    break
-
-    def run_program(self, program_dict: dict):
-        """
-        Recursively runs the program specified in the program_dict.
-
-        Args:
-            program_dict (dict): A dictionary containing the program to be executed.
-
-        Returns:
-            None
-        """
-        for function_or_program in program_dict["functions"]:
-            if function_or_program["type"] == "program":
-                self.run_program(function_or_program["program"])
-            else:
-                self.run_function(function_or_program, program_dict["variables"])
-
     def run(self):
         """
         Runs the program.
-
-        Returns:
-            None
         """
-        program_dict = self.program_dict
-        for function_or_program in program_dict["functions"]:
-            if function_or_program["type"] == "program":
-                self.run_program(function_or_program["program"])
+        for function in self.program_dict["functions"]:
+            if function["type"] == "program":
+                run_program(function["program"])
             else:
-                self.run_function(function_or_program, program_dict["variables"])
+                run_function(function, self.program_dict["variables"])
 
     def _get_parent_id(self, id: str):
         _check_is_string(id)
@@ -646,7 +503,7 @@ class Program:
 
     def _get_last_id_segment(self, id: str):
         _check_is_string(id)
-        return id.split(".")
+        return id.split(".")[-1]
 
 
 def create_program(*args, **kwargs):
@@ -787,20 +644,138 @@ def load_from_json(file_path: str) -> Program:
     return Program(data)
 
 
-def fake_api_call(prompt: str):
+def run_program(program_dict: dict):
     """
-    This function simulates an API call and returns a fake response.
+    Recursively runs the program specified in the program_dict.
 
     Args:
-        prompt (str): The prompt for the API call.
+        program_dict (dict): A dictionary containing the program to be executed.
 
     Returns:
-        str: The fake response from the API call.
+        None
     """
-    return "This is a fake API call."
+    print(program_dict)
+    for function in program_dict["functions"]:
+        if function["type"] == "program":
+            run_program(function["program"])
+        else:
+            run_function(function, program_dict["variables"])
 
 
-def fake_api_call(prompt: str):
+def run_function(function_dict: dict, variables):
+    """
+    Runs a function based on the provided function dictionary and variables.
+
+    Args:
+        function_dict (dict): A dictionary containing information about the function.
+        variables: The variables to be used in the function.
+
+    Returns:
+        None
+    """
+    # in the prompt of a function, reference to variables are quoted in [], so before calling the language model, we need to replace the reference with the actual value
+    # for example, if the prompt is "Hello [name]", and the value of name is "John", then the prompt should be "Hello John"
+
+    if function_dict["type"] == "standard":
+        prompt = _fill_in_variables_in_prompt(function_dict["prompt"], variables)
+        answer = api_call(prompt)
+        print("----------------------------------------------")
+        print(
+            "Function: "
+            + function_dict["name"]
+            + "\nPrompt: "
+            + prompt
+            + "\nAnswer: "
+            + answer
+        )
+        print("----------------------------------------------")
+        function_dict["answer"] = answer
+
+    elif function_dict["type"] == "switch":
+        condition_name = function_dict["condition"]
+        # traverse the variables list, find a variable whose name is condition_name
+        for variable in variables:
+            if variable["name"] == condition_name:
+                condition_value = variable["value"]
+                break
+        # traverse the cases list, find the case whose value is equal to condition_value
+
+        run_default = True
+        for case in function_dict["cases"]:
+            if case["value"] == condition_value:
+                run_default = False
+                case_program = case["program"]
+            if case["value"] == "default":
+                default_program = case["program"]
+        # run the program in the case
+        if run_default:
+            case_program = default_program
+
+        if "type" not in case_program:
+            run_program(case_program)
+        else:
+            run_function(case_program, variables)
+
+    elif function_dict["type"] == "while":
+        variable_l = None
+        for variable in variables:
+            if variable["name"] == function_dict["condition_l"]:
+                variable_l = variable
+                break
+        if variable_l is None:
+            raise ValueError(
+                "Error: condition_l ["
+                + function_dict["condition_l"]
+                + "] is not found in variables list"
+            )
+        variable_r = None
+        for variable in variables:
+            if variable["name"] == function_dict["condition_r"]:
+                variable_r = variable
+                break
+        if variable_r is None:
+            raise ValueError(
+                "Error: condition_r ["
+                + function_dict["condition_r"]
+                + "] is not found in variables list"
+            )
+
+        while variable_l["value"] != variable_r["value"]:
+            # assume body is a list of function
+            for function in function_dict["body"]:
+                run_function(function, variables)
+    else:
+        print("Error: unrecognized function type: " + function_dict["type"])
+        return
+
+    if "return" in function_dict and function_dict["return"] != "":
+        # change the corresponding variable's value
+        for variable in variables:
+            if variable["name"] == function_dict["return"]:
+                variable["value"] = function_dict["answer"]
+                break
+
+
+def _fill_in_variables_in_prompt(prompt: str, variables: list):
+    """
+    Replaces variables in the given prompt with their corresponding values.
+
+    Args:
+        prompt (str): The prompt string containing variables to be replaced.
+        variables (list): A list of dictionaries, where each dictionary contains the name and value of a variable.
+
+    Returns:
+        str: The prompt string with variables replaced by their values.
+    """
+    for variable in variables:
+        prompt = prompt.replace(f"[{variable['name']}]", variable["value"])
+    # if there is still [] quoted part in the prompt, warn the user about possibly incorrect reference
+    if "[" in prompt or "]" in prompt:
+        print("Warning: there might be incorrect reference in the prompt: " + prompt)
+    return prompt
+
+
+def api_call(prompt: str):
     # let user input the answer
     return input(
         prompt + '\ninput your answer here (default is "This is a fake api call"): '
