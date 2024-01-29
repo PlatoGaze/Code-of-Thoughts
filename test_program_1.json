@@ -40,7 +40,8 @@
                         "type": "standard",
                         "main": true,
                         "prompt": "Reference from main [name]",
-                        "output_type": "string"
+                        "output_type": "string",
+                        "name":"fun1"
                     }
                 ]
             }
@@ -50,7 +51,8 @@
             "type": "standard",
             "prompt": "Reference from input: [i0]",
             "main": true,
-            "output_type": "string"
+            "output_type": "string",
+            "name":"func2"
         }
     ]
 }

@@ -6,7 +6,7 @@ import copy
 class Function:
     def __init__(self, function_dict: dict) -> None:
         if Function.is_valid(function_dict):
-            self.properties = function_dict
+            self.function_dict = function_dict
         else:
             raise ValueError("Invalid function format")
 
@@ -49,7 +49,7 @@ class Function:
         return True
 
     def to_dict(self):
-        return self.properties.copy()
+        return self.function_dict.copy()
 
     def display(self):
         print(json.dumps(self.to_dict(), indent=4))
@@ -68,7 +68,7 @@ class Program:
         """
         program_dict = copy.deepcopy(program_dict)
         if Program.is_valid(program_dict):
-            self.properties = program_dict
+            self.program_dict = program_dict
         else:
             raise ValueError("Invalid program format")
 
@@ -83,9 +83,6 @@ class Program:
             "function": self.update_function,
             "variable": self.update_variable,
         }
-
-        self.save_to_file()
-        print("Program: " + self.properties["name"] + " saved to file.")
 
     @staticmethod
     def is_valid(program_dict: dict):
@@ -154,7 +151,7 @@ class Program:
             None
         """
         try:
-            program_name = self.properties["name"]
+            program_name = self.program_dict["name"]
         except KeyError:
             print("Error: 'name' key not found in properties.")
             return
@@ -168,12 +165,12 @@ class Program:
         main_json_path = os.path.join(program_folder, "main.json")
         main_data = {
             "name": program_name,
-            "variables": self.properties.get("variables", []),
+            "variables": self.program_dict.get("variables", []),
             "functions": [],
         }
 
-        # Traverse self.properties["functions"]
-        for function_data in self.properties.get("functions", []):
+        # Traverse self.program_dict["functions"]
+        for function_data in self.program_dict.get("functions", []):
             if function_data.get("type") == "program":
                 # If it's a program type, create a link
                 program_data = {
@@ -208,7 +205,7 @@ class Program:
         def wrapper(self, *args, **kwargs):
             result = method(self, *args, **kwargs)
             # check validity when properties are changed
-            Program.is_valid(self.properties)
+            Program.is_valid(self.program_dict)
             self.save_to_file()
             print("Program saved to file.")
             return result
@@ -222,63 +219,30 @@ class Program:
         Returns:
             dict: A dictionary representation of the program object.
         """
-        return self.properties.copy()
+        return self.program_dict.copy()
 
     def display(self, msg=""):
         print(msg)
         print(json.dumps(self.to_dict(), indent=4))
 
     def get_program(self, id: str = "1"):
-        """
-        Retrieves the program based on the given ID.
-
-        Args:
-            `id` (str): The ID of the program to retrieve. Defaults to "1".
-
-        Returns:
-            `dict`: The program corresponding to the given ID.
-        """
         references = id.split(".")
-        if id == "":
-            return self.properties
 
-        program = self.properties
+        program = self.program_dict
         for ix in range(0, len(references)):
             refer = references[ix]
             program = program["functions"][int(refer) - 1]["program"]
         return program
 
     def get_parent_program(self, id: str):
-        """
-        Retrieves the parent program of the given ID.
-
-        Args:
-            `id` (str): The ID of the program.
-
-        Returns:
-            The parent program object.
-
-        """
-        parent_id = self.__get_parent_id(id)
+        parent_id = self._get_parent_id(id)
         return self.get_program(parent_id)
 
     def get_variable(self, id: str) -> dict:
-        """
-        Retrieves a variable from the program based on its ID.
-
-        Args:
-            id (str): The ID of the variable in the format "program.variable_index".
-
-        Returns:
-            dict: The variable object.
-
-        Raises:
-            IndexError: If the program or variable index is out of range.
-        """
-        references = id.split(".")
-        program = self.get_program(".".join(references[:-1]))
-        variable = program["variables"][int(references[-1]) - 1]
-        return variable
+        # program = self.get_parent_program(id)
+        # variable = program["variables"][]
+        # return variable
+        return 0
 
     def read(self, id: str = "") -> dict:
         """
@@ -292,7 +256,7 @@ class Program:
             str or dict: The program or function corresponding to the given ID.
         """
         if id == "":  # return the root program
-            return self.properties
+            return self.program_dict
         # if the first char of id is an alphabet, then we should call get_variable
         if id[0].isalpha():
             return self.get_variable(id[1:])
@@ -664,20 +628,25 @@ class Program:
         Returns:
             None
         """
-        program_dict = self.properties
+        program_dict = self.program_dict
         for function_or_program in program_dict["functions"]:
             if function_or_program["type"] == "program":
                 self.run_program(function_or_program["program"])
             else:
                 self.run_function(function_or_program, program_dict["variables"])
 
-    def __get_parent_id(self, id: str):
-        __check_is_string(id)
+    def _get_parent_id(self, id: str):
+        _check_is_string(id)
         last_dot_index = id.rfind(".")
         if last_dot_index == -1:
-            raise ValueError("Invalid ID: ID must contain a '.' character")
+            raise ValueError("Invalid ID: Child ID must contain a '.' character")
 
         parent_id = id[:last_dot_index]
+        return parent_id
+
+    def _get_last_id_segment(self, id: str):
+        _check_is_string(id)
+        return id.split(".")
 
 
 def create_program(*args, **kwargs):
@@ -838,6 +807,6 @@ def fake_api_call(prompt: str):
     )
 
 
-def __check_is_string(input):
+def _check_is_string(input):
     if not isinstance(input, str):
         raise TypeError("Expected a string")

@@ -9,7 +9,7 @@
         },
         {
             "id": 2,
-            "name":"google",
+            "name": "google",
             "type": "url",
             "value": "www.google.com"
         }
@@ -19,9 +19,9 @@
             "id": 1,
             "type": "standard",
             "main": true,
-            "prompt": "Reference from main [m0]",
+            "prompt": "Reference from main [name]",
             "output_type": "string",
-            "name":"func1.1"
+            "name": "fun1"
         }
     ]
 }
