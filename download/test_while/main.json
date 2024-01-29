@@ -1,0 +1,35 @@
+{
+    "name": "test_while",
+    "variables": [
+        {
+            "id": 1,
+            "name": "country",
+            "type": "input",
+            "value": "ames"
+        },
+        {
+            "id": 2,
+            "name": "china",
+            "type": "fixed",
+            "value": "china"
+        }
+    ],
+    "functions": [
+        {
+            "id": 1,
+            "type": "while",
+            "condition_l": "country",
+            "condition_r": "china",
+            "body": [
+                {
+                    "type": "standard",
+                    "name": "location",
+                    "prompt": "Where were you born?",
+                    "main": true,
+                    "output_type": "string",
+                    "return": "country"
+                }
+            ]
+        }
+    ]
+}

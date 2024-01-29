@@ -1,0 +1,35 @@
+{
+    "name": "sub_test_run",
+    "variables": [
+        {
+            "id": 1,
+            "name": "animal",
+            "type": "input",
+            "value": "cat"
+        },
+        {
+            "id": 2,
+            "name": "drink",
+            "type": "url",
+            "value": "www.juice.com"
+        }
+    ],
+    "functions": [
+        {
+            "id": 1,
+            "type": "standard",
+            "main": true,
+            "name": "fun-meme",
+            "prompt": "This [animal] is so fun!",
+            "output_type": "string"
+        },
+        {
+            "id": 2,
+            "type": "standard",
+            "main": true,
+            "name": "sweet-drink",
+            "prompt": "A website selling drinks: [drink]",
+            "output_type": "string"
+        }
+    ]
+}

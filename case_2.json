@@ -1,0 +1,21 @@
+{
+    "name": "case_2",
+    "variables": [
+        {
+            "id": 1,
+            "name": "drink",
+            "type": "url",
+            "value": "www.soda.com"
+        }
+    ],
+    "functions": [
+        {
+            "id": 1,
+            "type": "standard",
+            "name": "drink",
+            "prompt": "Reference from input: [drink]",
+            "main": true,
+            "output_type": "string"
+        }
+    ]
+}
