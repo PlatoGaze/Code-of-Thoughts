@@ -4,27 +4,50 @@ import copy
 import re
 
 
+class Variable:
+    #!这儿初始化要可以输入参数而不是dict
+    def __init__(self, variable_dict: dict) -> None:
+        try:
+            self.variable_dict = Variable.validate_and_initialize(variable_dict)
+        except ValueError:
+            raise ValueError("Invalid function format")
+
+    @staticmethod
+    def validate_and_initialize(variable_dict: dict):
+        try:
+            if variable_dict["type"] in [
+                "standard",
+                "web",
+                "fixed",
+                "function_output",
+            ]:
+                required_keys = ["name", "type", "value"]
+                # Check if all required keys are in the dictionary
+                if all(key in variable_dict for key in required_keys):
+                    return {
+                        "name": variable_dict["name"],
+                        "type": variable_dict["type"],
+                        "value": variable_dict["value"],
+                    }
+                else:
+                    raise ValueError("Missing one or more required keys.")
+            else:
+                raise ValueError("Invalid Variable type.")
+        except Exception as e:
+            raise ValueError(f"Invalid variable format: {e}")
+
+
 class Function:
+    #! 这儿初始化要可以输入参数而不是dict
     def __init__(self, function_dict: dict) -> None:
-        if Function.is_valid(function_dict):
+        try:
+            Function.is_valid(function_dict)
             self.function_dict = function_dict
-        else:
+        except ValueError:
             raise ValueError("Invalid function format")
 
     @staticmethod
     def is_valid(function_dict):
-        """
-        Check whether the function dictionary is valid.
-
-        Args:
-            function_dict (dict): The function dictionary to be validated.
-
-        Raises:
-            ValueError: If the function dictionary is missing required keys.
-
-        Returns:
-            bool: True if the function dictionary is valid, False otherwise.
-        """
         if function_dict["type"] == "standard":
             check_keys = ["name", "prompt", "output_type"]
             for key in check_keys:
@@ -351,7 +374,6 @@ class Program:
 
         program["variables"].append(item)
 
-    @download_on_change
     def add(self, type: str, item, id: str = ""):
         """
         Adds an item of the specified type to the PlatoGaze object.
@@ -368,11 +390,10 @@ class Program:
         None
         """
         item = copy.deepcopy(item)
-        add_func = self.add_type_methods.get(type)
-        if add_func:
-            add_func(item, id)
-        else:
-            raise TypeError("Unrecognized type: " + type)
+        try:
+            self.add_type_methods[type](item, id)
+        except KeyError:
+            raise TypeError(f"Unrecognized type: {type}")
 
     def update_program(self, new_program, id: str = ""):
         """
@@ -460,7 +481,6 @@ class Program:
         ix = int(references[-1]) - 1
         program["variables"][ix].update(item)
 
-    @download_on_change
     def update(self, type: str, item, id: str = ""):
         """
         Update the specified item based on the given type.
@@ -477,11 +497,10 @@ class Program:
         - None
         """
         item = copy.deepcopy(item)
-        update_func = self.update_type_methods.get(type)
-        if update_func:
-            update_func(item, id)
-        else:
-            raise TypeError("Unrecognized type: " + type)
+        try:
+            self.update_type_methods[type](item, id)
+        except KeyError:
+            raise TypeError(f"Unrecognized type: {type}")
 
     def run(self):
         """
@@ -513,74 +532,66 @@ class Program:
             raise ValueError(f"Invalid ID format: {id}")
 
 
+#! 把初始化也得加入
+#! 不要飘在外面，把create_program 放到 Program 里，或直接删了
 def create_program(*args, **kwargs):
-    """
-    Create a new program object.
-
-    Args:
-        *args: Variable length argument list.
-        **kwargs: Arbitrary keyword arguments.
-
-    Returns:
-        Program: The newly created program object.
-    """
-    return Program(
-        {"name": kwargs.get("name", "undefined"), "variables": [], "functions": []}
-    )
-
-
-def create_function(*args, **kwargs):
-    """
-    Create a new function object.
-
-    Args:
-        *args: Variable length arguments.
-        **kwargs: Keyword arguments.
-
-    Keyword Args:
-        name (str): The name of the function. Default is "undefined".
-        type (str): The type of the function. Default is "standard".
-        main (bool): Whether the function is the main function. Default is True.
-        prompt (str): The prompt for the function. Default is an empty string.
-        output_type (str): The output type of the function. Default is "string".
-
-    Returns:
-        Function: The created function object.
-    """
-    return Function(
-        {
-            "name": kwargs.get("name", "undefined"),
-            "type": kwargs.get("type", "standard"),
-            "main": kwargs.get("main", True),
-            "prompt": kwargs.get("prompt", ""),
-            "output_type": kwargs.get("output_type", "string"),
-        }
-    )
-
-
-def create_variable(*args, **kwargs):
-    """
-    Create a variable dictionary with the specified type, name, and value.
-
-    Args:
-        *args: Additional positional arguments (not used in this function).
-        **kwargs: Additional keyword arguments.
-            type (str): The type of the variable (default: "input").
-            name (str): The name of the variable (default: "undefined").
-            value (str): The value of the variable (default: "").
-
-    Returns:
-        dict: A dictionary representing the variable.
-
-    """
-    return {
-        "type": kwargs.get("type", "input"),
-        "name": kwargs.get("name", "undefined"),
-        "value": kwargs.get("value", ""),
+    # 读取 'name'，为其他字段提供默认值
+    program_dict = {
+        "name": kwargs["name"],
+        "variables": kwargs.get("variables", []),
+        "functions": kwargs.get("functions", []),
     }
 
+    return Program(program_dict)
 
-create_type_methods = {
+
+#! 不要飘在外面，把create_function放到 Function 里，或直接删了
+def create_function(*args, **kwargs):
+    arg_names = ["name", "type", "main", "prompt", "output_type"]
+    defaults = {
+        "name": "undefined",
+        "type": "standard",
+        "main": True,
+        "prompt": "",
+        "output_type": "string",
+    }
+
+    # 使用 args 填充参数
+    params = dict(zip(arg_names, args))
+
+    # 使用 kwargs 填充或覆盖参数
+    params.update(kwargs)
+
+    # 确保所有参数都有值，使用默认值填充缺失的参数
+    for key in arg_names:
+        params.setdefault(key, defaults[key])
+
+    return Function(params)
+
+
+#! 需要给variable一个新的类
+#! 定义方式很怪.表现在不能按顺序读入，只能kwargs读入
+#! 更怪的地方是，它应该出现在 Variable 类里
+def create_variable(*args, **kwargs):
+    variable_dict = kwargs
+    try:
+        variable_type = variable_dict["type"]
+        if variable_type in ["standard", "web", "fixed", "function_output"]:
+            return Variable(
+                {
+                    "name": variable_dict["name"],
+                    "type": variable_type,
+                    "value": variable_dict["value"],
+                }
+            )
+    except SyntaxError as e:
+        print(f"Error: {e}")
+        return None
+
+
+# function, variable, program是组成整个项目的基本类型，它们各自的变量统称为object.
+# object_factory_registry 是目录，保存了创建各个基本类型的变量的创建方式
+_object_factory_registry = {
     "program": create_program,
     "function": create_function,
     "variable": create_variable,
@@ -588,69 +599,17 @@ create_type_methods = {
 
 
 def create(type: str = "program", *args, **kwargs):
-    """
-    Creates a new item of the specified type.
-
-    Args:
-        type (str): The type of item to create. Valid values are "program", "function", and "variable".
-        value (dict): The initial values of the item.
-
-    Raises:
-        TypeError: If the type is unrecognized.
-
-    Returns:
-        The newly created item.
-    """
-    create_func = create_type_methods.get(type)
-    if create_func:
+    try:
+        create_func = _object_factory_registry.get(type)
         return create_func(**kwargs)
-    else:
+    except TypeError:
         raise TypeError("Unrecognized type: " + type)
 
 
-def link_to_program(program_dict: dict):
-    """
-    Recursively traverses the functions in the program_dict and links the programs.
-
-    Args:
-        program_dict (dict): The dictionary representing the program.
-
-    Returns:
-        dict: The updated program dictionary with linked programs.
-    """
-    for function in program_dict["functions"]:
-        if function["type"] == "program":
-            link_to_program(function["program"])
-        elif function["type"] == "switch":
-            for item in function["cases"]:
-                if isinstance(item["program"], str) and item["program"] != "":
-                    file_path = item["program"] + ".json"
-                    with open(file_path, "r") as file:
-                        data = json.load(file)
-                    item["program"] = data
-                    link_to_program(item["program"])
-                elif item["program"] == "":
-                    empty_program = create_program(name="empty").to_dict()
-                    item["program"] = empty_program
-    return program_dict
+#! 应该在 run 里面 recursively 去查，返回给我的应该是 result
 
 
-def load_from_json(file_path: str) -> Program:
-    """
-    Load data from a JSON file and return a Program object.
-
-    Args:
-        file_path (str): The path to the JSON file.
-
-    Returns:
-        Program: The Program object created from the JSON data.
-    """
-    with open(file_path, "r") as file:
-        data = json.load(file)
-    link_to_program(data)
-    return Program(data)
-
-
+#!  update variable type 为 function_output 的东西。返回所以 type main的函数的output
 def run_program(program_dict: dict):
     """
     Recursively runs the program specified in the program_dict.
@@ -669,6 +628,7 @@ def run_program(program_dict: dict):
             run_function(function, program_dict["variables"])
 
 
+#!  update variable type 为 function_output 的东西
 def run_function(function_dict: dict, variables):
     """
     Runs a function based on the provided function dictionary and variables.
@@ -783,7 +743,6 @@ def _fill_in_variables_in_prompt(prompt: str, variables: list):
 
 
 def api_call(prompt: str):
-    # let user input the answer
     return input(
         prompt + '\ninput your answer here (default is "This is a fake api call"): '
     )

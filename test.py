@@ -67,7 +67,7 @@ program = pl.Program(data_dict)
 # print(program._get_last_id_segment("1.1234.12345"))
 # print(program._get_parent_id("1"))
 # print(program.get_parent_program("1.1"))
-# print(program.get_variable("1.ZJ1"))
+# print(program.get_variable("1.1"))
 
 # pl.run_function(function_dict, [var_dict])
 # pl.run_program(program_dict)
