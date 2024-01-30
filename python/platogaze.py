@@ -217,23 +217,6 @@ class Program:
 
         print(f"Files saved successfully for program: {program_name}")
 
-    def download(method):
-        """This method is a decorator for all methods that change the program object. It will automatically save the program to a file after the method is executed.
-
-        Args:
-            method (function): The method to be decorated.
-        """
-
-        def wrapper(self, *args, **kwargs):
-            result = method(self, *args, **kwargs)
-            # check validity when properties are changed
-            Program.is_valid(self.program_dict)
-            self.save()
-            print("Program saved to file.")
-            return result
-
-        return wrapper
-
     def to_dict(self):
         return self.program_dict.copy()
 
