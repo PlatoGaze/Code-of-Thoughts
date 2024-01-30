@@ -1,0 +1,21 @@
+{
+    "name": "case_1",
+    "variables": [
+        {
+            "id": 1,
+            "name": "anminal",
+            "type": "input",
+            "value": "puppy"
+        }
+    ],
+    "functions": [
+        {
+            "id": 1,
+            "name": "anminal",
+            "type": "standard",
+            "prompt": "Reference from input: [anminal]",
+            "main": true,
+            "output_type": "string"
+        }
+    ]
+}

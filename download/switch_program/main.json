@@ -1,0 +1,93 @@
+{
+    "name": "switch_program",
+    "variables": [
+        {
+            "id": 1,
+            "name": "china",
+            "type": "input",
+            "value": "china"
+        },
+        {
+            "id": 2,
+            "name": "america",
+            "type": "fixed",
+            "value": "america"
+        },
+        {
+            "id": 3,
+            "name": "country",
+            "type": "input",
+            "value": "america"
+        }
+    ],
+    "functions": [
+        {
+            "id": 1,
+            "type": "switch",
+            "main": true,
+            "output_type": "string",
+            "name": "switch-with-country",
+            "condition": "country",
+            "cases": [
+                {
+                    "value": "china",
+                    "program": {
+                        "name": "case_1",
+                        "variables": [
+                            {
+                                "id": 1,
+                                "name": "anminal",
+                                "type": "input",
+                                "value": "puppy"
+                            }
+                        ],
+                        "functions": [
+                            {
+                                "id": 1,
+                                "name": "anminal",
+                                "type": "standard",
+                                "prompt": "Reference from input: [anminal]",
+                                "main": true,
+                                "output_type": "string"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "value": "america",
+                    "program": {
+                        "name": "case_2",
+                        "variables": [
+                            {
+                                "id": 1,
+                                "name": "drink",
+                                "type": "url",
+                                "value": "www.soda.com"
+                            }
+                        ],
+                        "functions": [
+                            {
+                                "id": 1,
+                                "type": "standard",
+                                "name": "drink",
+                                "prompt": "Reference from input: [drink]",
+                                "main": true,
+                                "output_type": "string"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "value": "default",
+                    "program": {
+                        "type": "standard",
+                        "name": "default-behavior",
+                        "prompt": "3 references here: [country], [america], [china]",
+                        "main": true,
+                        "output_type": "string"
+                    }
+                }
+            ]
+        }
+    ]
+}

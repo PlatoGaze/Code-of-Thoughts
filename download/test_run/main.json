@@ -1,0 +1,39 @@
+{
+    "name": "test_run",
+    "variables": [
+        {
+            "id": 1,
+            "name": "country",
+            "type": "input",
+            "value": "Canan"
+        },
+        {
+            "id": 2,
+            "name": "google",
+            "type": "url",
+            "value": "www.google.com"
+        }
+    ],
+    "functions": [
+        {
+            "id": 1,
+            "program": "sub_test_run"
+        },
+        {
+            "id": 2,
+            "name": "visit-website",
+            "type": "standard",
+            "prompt": "Check out this website: [google]",
+            "main": true,
+            "output_type": "string"
+        },
+        {
+            "id": 3,
+            "name": "visit-country",
+            "type": "standard",
+            "prompt": "Been to [country]",
+            "main": true,
+            "output_type": "string"
+        }
+    ]
+}

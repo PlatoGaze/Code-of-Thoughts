@@ -1,0 +1,27 @@
+{
+    "name": "test_program_2",
+    "variables": [
+        {
+            "id": 1,
+            "name": "country",
+            "type": "input",
+            "value": "china"
+        },
+        {
+            "id": 2,
+            "name":"google",
+            "type": "url",
+            "value": "www.google.com"
+        }
+    ],
+    "functions": [
+        {
+            "id": 1,
+            "type": "standard",
+            "main": true,
+            "prompt": "Reference from main [m0]",
+            "output_type": "string",
+            "name":"func1.1"
+        }
+    ]
+}

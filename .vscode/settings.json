@@ -1,0 +1,7 @@
+{
+    "python.analysis.extraPaths": [
+        "D:\\Softwares\\anaconda3\\Lib\\site-packages",
+        "./python/src",
+        "./python"
+    ]
+}
