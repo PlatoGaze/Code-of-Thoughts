@@ -50,25 +50,25 @@ class Function:
     def is_valid(function_dict):
         if function_dict["type"] == "standard":
             check_keys = ["name", "prompt", "output_type"]
-            for key in check_keys:
-                if key not in function_dict:
-                    raise ValueError(
-                        f"Invalid function format: missing key: {key}\nfunction: {function_dict}"
-                    )
+            if not all(key in function_dict for key in check_keys):
+                missing_keys = [key for key in check_keys if key not in function_dict]
+                raise ValueError(
+                    f"Invalid function format: missing keys: {missing_keys}\nfunction: {function_dict}"
+                )
         elif function_dict["type"] == "switch":
             check_keys = ["name", "output_type", "cases"]
-            for key in check_keys:
-                if key not in function_dict:
-                    raise ValueError(
-                        f"Invalid function format: missing key: {key}\nfunction name: {function_dict['name']}"
-                    )
+            if not all(key in function_dict for key in check_keys):
+                missing_keys = [key for key in check_keys if key not in function_dict]
+                raise ValueError(
+                    f"Invalid function format: missing keys: {missing_keys}\nfunction name: {function_dict['name']}"
+                )
             for case in function_dict["cases"]:
                 check_keys = ["value", "program"]
-                for key in check_keys:
-                    if key not in case:
-                        raise ValueError(
-                            f"Invalid function format: missing key: {key}\nfunction_name: {function_dict['name']}"
-                        )
+                if not all(key in case for key in check_keys):
+                    missing_keys = [key for key in check_keys if key not in case]
+                    raise ValueError(
+                        f"Invalid function format: missing keys: {missing_keys}\nfunction_name: {function_dict['name']}"
+                    )
 
         return True
 
@@ -159,7 +159,7 @@ class Program:
 
         return True
 
-    def save_to_file(self):
+    def save(self):
         """
         Saves the program data to files.
 
@@ -217,7 +217,7 @@ class Program:
 
         print(f"Files saved successfully for program: {program_name}")
 
-    def download_on_change(method):
+    def download(method):
         """This method is a decorator for all methods that change the program object. It will automatically save the program to a file after the method is executed.
 
         Args:
@@ -228,7 +228,7 @@ class Program:
             result = method(self, *args, **kwargs)
             # check validity when properties are changed
             Program.is_valid(self.program_dict)
-            self.save_to_file()
+            self.save()
             print("Program saved to file.")
             return result
 
