@@ -243,7 +243,7 @@ class Program:
         variable = program["variables"][int(self._get_last_id_segment(id))]
         return variable
 
-    def read(self, id: str = "") -> dict:
+    def read(self, id: str = "", type: str = "function") -> dict:
         """
         Retrieves a program or function based on the given ID.
 
@@ -257,8 +257,8 @@ class Program:
         if id == "":  # return the root program
             return self.program_dict
         # if the first char of id is an alphabet, then we should call get_variable
-        if id[0].isalpha():
-            return self.get_variable(id[1:])
+        if type == "data":
+            return self.get_variable(id)
         references = id.split(".")
         program = self.get_program(".".join(references[:-1]))
         program = program["functions"][int(references[-1]) - 1]
